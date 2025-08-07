@@ -1,34 +1,32 @@
 # AuraBot Dashboard
 
-Welcome to the AuraBot Dashboard, a comprehensive web interface to manage and configure your AuraBot Discord bot. This dashboard allows you to control settings, view analytics, manage moderation logs, and leverage AI to create engaging content for your community.
+AuraBot Dashboard is a comprehensive web interface for managing the AuraBot Discord bot. It provides server administrators with a powerful set of tools to configure settings, monitor activity, and generate content, all from a clean and intuitive user interface.
 
-This project consists of two main parts:
-1.  **Frontend:** A React-based web dashboard built with Vite, TypeScript, and Tailwind CSS.
-2.  **Backend Bot:** A Node.js Discord bot powered by `discord.js`.
+The project is built on a modern technology stack, connecting a React-based frontend with a Node.js bot through a self-hosted Appwrite backend. This architecture ensures real-time updates and gives you full ownership of your data.
 
-The two parts communicate via a self-hosted Appwrite database, which acts as the single source of truth for all configurations, logs, and statistics.
+## Key Features
 
-## ✨ Features
+- **Centralized Dashboard**: View real-time server statistics, including member counts, online status, and recent message activity.
+- **Server Configuration**: Easily manage settings for welcome/goodbye messages, automatic role assignments, and the server-wide leveling system.
+- **Content & Engagement Tools**:
+    - **Custom Commands**: Create, edit, and delete custom text commands.
+    - **YouTube Notifications**: Automatically announce new video uploads from specified YouTube channels.
+    - **AI Content Helper**: Leverage the Google Gemini API to generate announcements, event ideas, and polls.
+- **Moderation & Logging**:
+    - **Audit & Command Logs**: Access detailed logs for moderation actions, server events, and command usage.
+    - **Member Management**: Browse and search server members with options for moderation actions.
+    - **AI Auto-Moderation**: Automatically flag and remove messages containing spam or toxic content.
+- **Secure & Self-Hosted**: Features a complete authentication system and operates on your own Appwrite instance, ensuring your data remains private and secure.
 
-- **📊 Live Dashboard:** View real-time server statistics, including member counts and message activity.
-- **⚙️ Server Settings:** Easily configure welcome/goodbye messages and auto-role functionality.
-- **📝 Custom Commands:** Create, edit, and delete custom text commands for your bot.
-- **📜 Audit & Command Logs:** View detailed logs for server events (joins, leaves, deleted messages) and command usage.
-- **▶️ YouTube Notifications:** Automatically announce new video uploads from a specified YouTube channel.
-- **🤖 AI Content Helper:** Use the Gemini API to generate announcements, event ideas, and polls for your server.
-- **🔐 Secure Authentication:** A full login/register system powered by Appwrite Authentication ensures only authorized users can access the dashboard.
-- **🚀 Self-Hosted:** Full control over your data by running on your own Appwrite instance.
-- **⚡ Modern Tech:** Built with Vite for a fast and efficient development experience.
+## Technology Stack
 
-## 🛠️ Tech Stack
+- **Frontend**: React, TypeScript, Vite, Tailwind CSS, Recharts
+- **Bot**: Node.js, Discord.js, node-cron
+- **Backend & Database**: Appwrite (Self-Hosted)
+- **AI Services**: Google Gemini API
 
-- **Frontend:** React, TypeScript, Vite, Tailwind CSS, Recharts
-- **Bot:** Node.js, Discord.js, node-cron
-- **Backend & Database:** Appwrite (self-hosted)
-- **AI:** Google Gemini API
+## Getting Started
 
-## 🚀 Getting Started
+To set up the AuraBot Dashboard, you will need to configure the Appwrite backend, set up the Discord bot, and run the frontend application.
 
-To get the AuraBot Dashboard up and running, you need to set up your Appwrite instance, configure the bot, and run both the frontend and the bot.
-
-**For detailed, step-by-step instructions, please see the [SETUP.md](./SETUP.md) file.** This guide contains all the necessary steps to configure the backend, install dependencies, and run both the bot and the frontend server correctly.
+**For a complete, step-by-step guide, please refer to the [SETUP.md](./SETUP.md) file.** It contains all the necessary instructions to get the project running.

@@ -9,28 +9,57 @@ export interface RoleReward {
     roleId: string;
 }
 
+// --- New Nested Settings Interfaces ---
+export interface WelcomeSettings {
+    enabled: boolean;
+    message: string;
+    channelId: string;
+}
+
+export interface GoodbyeSettings {
+    enabled: boolean;
+    message: string;
+    channelId: string;
+}
+
+export interface AutoRoleSettings {
+    enabled: boolean;
+    roleId: string;
+}
+
+export interface LevelingSettings {
+    enabled: boolean;
+    channelId: string;
+    message: string;
+    roleRewards: RoleReward[];
+    xpPerMessageMin: number;
+    xpPerMessageMax: number;
+    cooldownSeconds: number;
+    blacklistedChannels: string[];
+}
+
+export interface AutoModSettings {
+    aiEnabled: boolean;
+    wordFilterEnabled: boolean;
+    wordBlacklist: string[];
+    linkFilterEnabled: boolean;
+    linkWhitelist: string[];
+    inviteFilterEnabled: boolean;
+    mentionSpamEnabled: boolean;
+    mentionSpamLimit: number;
+}
+
+// Replaces the old flat ServerSettings
 export interface ServerSettings {
   id?: string;
   guildId: string;
-  welcomeMessageEnabled: boolean;
-  welcomeMessage: string;
-  welcomeChannelId: string;
-  goodbyeMessageEnabled: boolean;
-  goodbyeMessage: string;
-  goodbyeChannelId: string;
-  autoRoleEnabled: boolean;
-  autoRoleRoleId: string;
-  aiAutoModEnabled: boolean;
-  levelingEnabled: boolean;
-  levelUpChannelId: string;
-  levelUpMessage: string;
-  levelingRoleRewards: RoleReward[] | string;
-  // New granular leveling controls
-  levelingXpPerMessageMin: number;
-  levelingXpPerMessageMax: number;
-  levelingCooldownSeconds: number;
-  levelingBlacklistedChannels: string[] | string; // Array of channel IDs
+  welcome: WelcomeSettings;
+  goodbye: GoodbyeSettings;
+  autoRole: AutoRoleSettings;
+  leveling: LevelingSettings;
+  autoMod: AutoModSettings;
 }
+
 
 export interface YoutubeSubscription {
   id?: string;
@@ -55,6 +84,8 @@ export enum LogType {
   UserKicked = 'USER_KICKED',
   UserUnbanned = 'USER_UNBANNED',
   AI_MODERATION = 'AI_MODERATION',
+  AUTO_MOD_ACTION = 'AUTO_MOD_ACTION',
+  GIVEAWAY_ENDED = 'GIVEAWAY_ENDED',
 }
 
 export interface LogEntry {
@@ -77,6 +108,8 @@ export interface ServerStats {
   messagesToday: number;
   commandCount: number;
   messagesWeekly: { day: string; count: number }[];
+  totalWarnings: number;
+  roleDistribution: { name: string, count: number, color: string }[] | string;
 }
 
 export interface CustomCommand {
@@ -84,6 +117,44 @@ export interface CustomCommand {
   guildId: string;
   command: string;
   response: string;
+  isEmbed: boolean;
+  embedContent: string;
+}
+
+export interface ReactionRole {
+  id?: string;
+  guildId: string;
+  channelId: string;
+  messageId: string;
+  embedTitle: string;
+  embedDescription: string;
+  embedColor: string;
+  roles: { emoji: string, roleId: string }[] | string;
+}
+
+export interface ScheduledMessage {
+  id?: string;
+  guildId: string;
+  channelId: string;
+  content: string;
+  schedule: string; // ISO string
+  repeat: 'none' | 'daily' | 'weekly' | 'monthly';
+  status: 'pending' | 'sent' | 'error';
+  lastRun?: string;
+  nextRun: string;
+}
+
+export interface Giveaway {
+  id?: string;
+  guildId: string;
+  channelId: string;
+  messageId?: string;
+  prize: string;
+  winnerCount: number;
+  endsAt: string; // ISO String
+  status: 'running' | 'ended' | 'error';
+  requiredRoleId?: string;
+  winners?: string[]; // Array of user IDs
 }
 
 export interface CommandLogEntry {
@@ -135,7 +206,6 @@ export interface GuildMember {
     joinedAt: string;
 }
 
-// New for Smart Settings Page
 export interface DiscordChannel {
     id: string;
     name: string;
@@ -152,4 +222,17 @@ export interface ServerMetadata {
     guildId: string;
     channels: DiscordChannel[];
     roles: DiscordRole[];
+}
+
+// Bot Queue Types
+export interface ReactionRoleQueueItem {
+    id?: string;
+    guildId: string;
+    reactionRoleId: string; // ID of the main ReactionRole document
+}
+
+export interface GiveawayQueueItem {
+    id?: string;
+    guildId: string;
+    giveawayId: string; // ID of the main Giveaway document
 }

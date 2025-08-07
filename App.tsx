@@ -4,7 +4,7 @@ import Sidebar from './components/Sidebar';
 import Header from './components/Header';
 import DashboardPage from './pages/DashboardPage';
 import SettingsPage from './pages/SettingsPage';
-import AuditLogPage from './pages/ModerationPage';
+import AuditLogPage from './pages/AuditLogPage';
 import YoutubePage from './pages/YoutubePage';
 import AiHelperPage from './pages/AiHelperPage';
 import CommandsPage from './pages/CommandsPage';
@@ -19,8 +19,14 @@ import RegisterPage from './pages/RegisterPage';
 import ProtectedRoute from './components/ProtectedRoute';
 import Spinner from './components/Spinner';
 import { ServerProvider } from './contexts/ServerContext';
-import { ModalProvider } from './contexts/ModalContext'; // New
-import ModerationActionModal from './components/ModerationActionModal'; // New
+import { ModalProvider } from './contexts/ModalContext';
+import ModerationActionModal from './components/ModerationActionModal';
+import AutoModPage from './pages/AutoModPage';
+import ReactionRolesPage from './pages/ReactionRolesPage';
+import ScheduledMessagesPage from './pages/ScheduledMessagesPage';
+import GiveawaysPage from './pages/GiveawaysPage';
+import MusicPage from './pages/MusicPage';
+
 
 const App: React.FC = () => {
   return (
@@ -78,6 +84,11 @@ const DashboardLayout: React.FC = () => {
             <Route path="/dashboard" element={<DashboardPage />} />
             <Route path="/settings" element={<SettingsPage />} />
             <Route path="/commands" element={<CommandsPage />} />
+            <Route path="/auto-moderation" element={<AutoModPage />} />
+            <Route path="/reaction-roles" element={<ReactionRolesPage />} />
+            <Route path="/scheduled-messages" element={<ScheduledMessagesPage />} />
+            <Route path="/giveaways" element={<GiveawaysPage />} />
+            <Route path="/music" element={<MusicPage />} />
             <Route path="/audit-log" element={<AuditLogPage />} />
             <Route path="/command-log" element={<CommandLogPage />} />
             <Route path="/leaderboard" element={<LeaderboardPage />} />

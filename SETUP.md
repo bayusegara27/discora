@@ -7,18 +7,15 @@ This guide provides step-by-step instructions for setting up the Appwrite backen
 An Appwrite instance is required. If you do not have one, please follow the [official Appwrite installation guide](https://appwrite.io/docs/installation).
 
 1.  **Create a New Project**
-
     - In your Appwrite console, click `Create project`.
     - Name it `AuraBot` or a name of your choice. Note the **Project ID** and **API Endpoint** for later use.
 
 2.  **Add a Web Platform for Local Development**
-
     - Navigate to your project's **Overview** page.
     - Under "Platforms", select `Add a platform` and choose **Web**.
     - Set the hostname to `localhost`. This is required for local development.
 
 3.  **Configure Authentication**
-
     - Go to the **Auth** section.
     - In the **Settings** tab, ensure that **Email/Password** login is enabled.
 
@@ -26,20 +23,18 @@ An Appwrite instance is required. If you do not have one, please follow the [off
     - Go to the **API Keys** section.
     - Select `Create API key`.
     - Name it `AuraBot Bot Key` and grant it the following scopes:
-      - `databases.read`
-      - `databases.write`
-      - `documents.read`
-      - `documents.write`
+        - `databases.read`
+        - `databases.write`
+        - `documents.read`
+        - `documents.write`
     - Create the key and securely copy the **API Key Secret**.
 
 ## 2. Local Project Configuration
 
 1.  **Prerequisites**
-
     - Ensure [Node.js](https://nodejs.org/) (v18 or higher) is installed.
 
 2.  **Create Environment File**
-
     - In the project's root directory, create a file named `.env`.
     - Add the following content, replacing the placeholder values with your Appwrite and Gemini credentials.
 
@@ -75,21 +70,18 @@ This project includes a script to automatically configure your Appwrite database
 ## 4. Bot Setup
 
 1.  **Configure Bot Environment**
-
     - Navigate to the `/bot` directory.
     - Rename `env.example.js` to `env.js`.
     - Open `env.js` and fill in the required credentials.
 
 2.  **Enable Privileged Gateway Intents**
-
     > **This is a critical step.** The bot will not function correctly without these intents enabled.
-
     - Go to the [Discord Developer Portal](https://discord.com/developers/applications) and select your bot.
     - Navigate to the **Bot** page.
     - Under the **Privileged Gateway Intents** section, enable all three intents:
-      - `PRESENCE INTENT`
-      - `SERVER MEMBERS INTENT`
-      - `MESSAGE CONTENT INTENT`
+        - `PRESENCE INTENT`
+        - `SERVER MEMBERS INTENT`
+        - `MESSAGE CONTENT INTENT`
     - Save your changes.
 
 3.  **Install Bot Dependencies and Run**
@@ -119,7 +111,6 @@ This project includes a script to automatically configure your Appwrite database
 Follow these steps to deploy your dashboard to Appwrite's built-in hosting service.
 
 1.  **Build the Project for Production**
-
     - In your terminal at the project's **root directory**, run the build command:
       ```bash
       npm run build
@@ -127,10 +118,8 @@ Follow these steps to deploy your dashboard to Appwrite's built-in hosting servi
     - This command creates an optimized, static version of your site in a new `/dist` folder.
 
 2.  **Package the Build Files**
-
     - Appwrite Hosting requires the build files to be uploaded in a `.tar.gz` archive.
     - Create this archive using the following commands:
-
       ```bash
       # Navigate into the build output directory
       cd dist
@@ -141,7 +130,6 @@ Follow these steps to deploy your dashboard to Appwrite's built-in hosting servi
       # Navigate back to the project root
       cd ..
       ```
-
     - You should now have a `deployment.tar.gz` file in your project's root folder.
 
 3.  **Deploy in the Appwrite Console**
@@ -150,16 +138,16 @@ Follow these steps to deploy your dashboard to Appwrite's built-in hosting servi
     - **Upload**: Drag and drop your `deployment.tar.gz` file into the upload area.
     - **Details**: Give your site a name (e.g., `AuraBot Dashboard`).
     - **Settings**:
-      - **Framework**: Select `other`.
-      - **Build Settings**:
-        - **Install command**: Leave this field empty.
-        - **Build command**: Leave this field empty.
-        - **Output directory**: Set this to `/`. This is very important.
+        - **Framework**: Select `other`.
+        - **Build Settings**:
+            - **Install command**: Leave this field empty.
+            - **Build command**: Leave this field empty.
+            - **Output directory**: Set this to `/`. This is very important.
     - **Environment variables**:
-      > **This is a critical step for the AI Helper to function.**
-      - Click the **+** button to add a new variable.
-      - **Key**: `VITE_GEMINI_API_KEY`
-      - **Value**: Paste your actual Google Gemini API key here.
+        > **This is a critical step for the AI Helper to function.**
+        - Click the **+** button to add a new variable.
+        - **Key**: `VITE_GEMINI_API_KEY`
+        - **Value**: Paste your actual Google Gemini API key here.
     - **Deploy**: Click the **Deploy** button at the bottom of the page.
 
 Appwrite will now provision a domain and deploy your files. Once complete, you can visit the provided URL.

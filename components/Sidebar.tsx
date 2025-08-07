@@ -6,16 +6,39 @@ import { useToast } from '../contexts/ToastContext';
 import { appwriteService } from '../services/appwrite';
 import { BotInfo } from '../types';
 
-const navItems = [
-  { path: '/dashboard', label: 'Dashboard', icon: ICONS.dashboard },
-  { path: '/settings', label: 'Server Settings', icon: ICONS.settings },
-  { path: '/members', label: 'Members', icon: ICONS.members },
-  { path: '/leaderboard', label: 'Leaderboard', icon: ICONS.leaderboard },
-  { path: '/commands', label: 'Custom Commands', icon: ICONS.commands },
-  { path: '/audit-log', label: 'Audit Log', icon: ICONS.auditLog },
-  { path: '/command-log', label: 'Command Log', icon: ICONS.commandLog },
-  { path: '/youtube', label: 'YouTube Notifications', icon: ICONS.youtube },
-  { path: '/ai-helper', label: 'AI Helper', icon: ICONS.ai },
+type NavLinkItem = {
+  type: 'link';
+  path: string;
+  label: string;
+  icon: React.ReactNode;
+};
+
+type NavDividerItem = {
+  type: 'divider';
+  label: string;
+};
+
+type NavItemUnion = NavLinkItem | NavDividerItem;
+
+
+const navItems: NavItemUnion[] = [
+  { type: 'link', path: '/dashboard', label: 'Dashboard', icon: ICONS.dashboard },
+  { type: 'link', path: '/settings', label: 'Server Settings', icon: ICONS.settings },
+  { type: 'divider', label: 'Features' },
+  { type: 'link', path: '/auto-moderation', label: 'Auto Moderation', icon: ICONS.autoMod },
+  { type: 'link', path: '/reaction-roles', label: 'Reaction Roles', icon: ICONS.reactionRoles },
+  { type: 'link', path: '/scheduled-messages', label: 'Scheduled Messages', icon: ICONS.scheduledMessages },
+  { type: 'link', path: '/giveaways', label: 'Giveaways', icon: ICONS.giveaways },
+  { type: 'link', path: '/youtube', label: 'YouTube Notifications', icon: ICONS.youtube },
+  { type: 'link', path: '/commands', label: 'Custom Commands', icon: ICONS.commands },
+  { type: 'link', path: '/music', label: 'Music Player', icon: ICONS.music },
+  { type: 'divider', label: 'Community' },
+  { type: 'link', path: '/leaderboard', label: 'Leaderboard', icon: ICONS.leaderboard },
+  { type: 'link', path: '/members', label: 'Members', icon: ICONS.members },
+  { type: 'divider', label: 'Logs & Tools' },
+  { type: 'link', path: '/audit-log', label: 'Audit Log', icon: ICONS.auditLog },
+  { type: 'link', path: '/command-log', label: 'Command Log', icon: ICONS.commandLog },
+  { type: 'link', path: '/ai-helper', label: 'AI Helper', icon: ICONS.ai },
 ];
 
 interface NavItemProps {
@@ -42,6 +65,10 @@ const NavItem: React.FC<NavItemProps> = ({ path, label, icon, onClick }) => (
       <span className="ml-3">{label}</span>
     </NavLink>
   </li>
+);
+
+const NavDivider: React.FC<{label: string}> = ({ label }) => (
+    <li className="px-2 pt-4 pb-2 text-xs font-bold text-text-secondary uppercase tracking-wider">{label}</li>
 );
 
 interface SidebarProps {
@@ -116,11 +143,13 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, setOpen }) => {
         </div>
       </div>
 
-      <nav className="flex-1">
-        <ul className="space-y-2">
-          {navItems.map((item) => (
-            <NavItem key={item.path} {...item} onClick={handleNavItemClick} />
-          ))}
+      <nav className="flex-1 overflow-y-auto">
+        <ul className="space-y-1">
+          {navItems.map((item, index) => 
+            item.type === 'link'
+            ? <NavItem key={item.path} path={item.path} label={item.label} icon={item.icon} onClick={handleNavItemClick} />
+            : <NavDivider key={`divider-${index}`} label={item.label} />
+          )}
         </ul>
       </nav>
 

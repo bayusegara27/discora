@@ -1,12 +1,23 @@
-import React, { useState, useEffect } from 'react';
-import { appwriteService } from '../services/appwrite';
-import { ServerSettings, RoleReward, ServerMetadata, DiscordRole, DiscordChannel } from '../types';
-import Spinner from '../components/Spinner';
-import ToggleSwitch from '../components/ToggleSwitch';
-import { useToast } from '../contexts/ToastContext';
-import { useServer } from '../contexts/ServerContext';
+import React, { useState, useEffect } from "react";
+import { appwriteService } from "../services/appwrite";
+import {
+  ServerSettings,
+  RoleReward,
+  ServerMetadata,
+  DiscordRole,
+  DiscordChannel,
+  WelcomeSettings,
+  GoodbyeSettings,
+  AutoRoleSettings,
+  LevelingSettings,
+} from "../types";
+import Spinner from "../components/Spinner";
+import ToggleSwitch from "../components/ToggleSwitch";
+import { useToast } from "../contexts/ToastContext";
+import { useServer } from "../contexts/ServerContext";
 
-type Tab = 'general' | 'roles' | 'moderation' | 'leveling';
+type Tab = "general" | "roles" | "leveling";
+type SettingsCategory = "welcome" | "goodbye" | "autoRole" | "leveling";
 
 const SettingsPage: React.FC = () => {
   const { selectedServer } = useServer();
@@ -15,8 +26,9 @@ const SettingsPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const { addToast } = useToast();
-  const [activeTab, setActiveTab] = useState<Tab>('general');
-  const [newReward, setNewReward] = useState({ level: '', roleId: '' });
+  const [activeTab, setActiveTab] = useState<Tab>("leveling");
+  const [newReward, setNewReward] = useState({ level: "", roleId: "" });
+  const [blacklistSearch, setBlacklistSearch] = useState("");
 
   useEffect(() => {
     if (!selectedServer) {
@@ -24,42 +36,43 @@ const SettingsPage: React.FC = () => {
       return;
     }
     const loadData = async () => {
-        setLoading(true);
-        try {
-            const [settingsData, metadataData] = await Promise.all([
-                appwriteService.getSettings(selectedServer.guildId),
-                appwriteService.getServerMetadata(selectedServer.guildId)
-            ]);
-            setSettings(settingsData);
-            setMetadata(metadataData);
-        } catch (error) {
-            addToast("Failed to load server data. Please try again.", 'error');
-        } finally {
-            setLoading(false);
-        }
-    }
+      setLoading(true);
+      try {
+        const [settingsData, metadataData] = await Promise.all([
+          appwriteService.getSettings(selectedServer.guildId),
+          appwriteService.getServerMetadata(selectedServer.guildId),
+        ]);
+        setSettings(settingsData);
+        setMetadata(metadataData);
+      } catch (error) {
+        addToast("Failed to load server data. Please try again.", "error");
+      } finally {
+        setLoading(false);
+      }
+    };
     loadData();
   }, [selectedServer, addToast]);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+  const handleNestedChange = <C extends SettingsCategory>(
+    category: C,
+    key: keyof ServerSettings[C],
+    value: any
+  ) => {
     if (!settings) return;
-    const { name, value, type } = e.target;
-    
-    if (type === 'number') {
-        setSettings({ ...settings, [name]: parseInt(value, 10) });
-    } else {
-        setSettings({ ...settings, [name]: value });
-    }
-  };
-  
-  const handleMultiSelectChange = (key: keyof ServerSettings, selectedOptions: string[]) => {
-      if(!settings) return;
-      setSettings({ ...settings, [key]: selectedOptions });
-  }
+    setSettings((prev) => {
+      if (!prev) return null;
 
-  const handleToggleChange = (key: keyof ServerSettings, value: boolean) => {
-    if (!settings) return;
-    setSettings({ ...settings, [key]: value });
+      const categoryObject = prev[category];
+      const isNumeric = typeof categoryObject[key] === "number";
+
+      return {
+        ...prev,
+        [category]: {
+          ...categoryObject,
+          [key]: isNumeric ? parseInt(value, 10) || 0 : value,
+        },
+      };
+    });
   };
 
   const handleSave = async (e: React.FormEvent) => {
@@ -68,202 +81,618 @@ const SettingsPage: React.FC = () => {
     setSaving(true);
     try {
       await appwriteService.updateSettings(settings);
-      addToast('Settings saved! The bot will apply them within 1 minute.', 'success');
+      addToast(
+        "Settings saved! The bot will apply them within 1 minute.",
+        "success"
+      );
     } catch (error) {
       console.error("Failed to save settings:", error);
-      addToast('Failed to save settings. Please try again.', 'error');
+      addToast("Failed to save settings. Please try again.", "error");
     } finally {
       setSaving(false);
     }
   };
-  
+
   const handleAddReward = () => {
     if (!settings || !newReward.level || !newReward.roleId) {
-        addToast("Please select both a Level and a Role.", 'error');
-        return;
+      addToast("Please select both a Level and a Role.", "error");
+      return;
     }
-    const rewards = Array.isArray(settings.levelingRoleRewards) ? settings.levelingRoleRewards : [];
-    const updatedRewards = [...rewards, { level: parseInt(newReward.level, 10), roleId: newReward.roleId }];
-    setSettings({ ...settings, levelingRoleRewards: updatedRewards });
-    setNewReward({ level: '', roleId: '' });
+    const rewards = settings.leveling.roleRewards;
+    const updatedRewards = [
+      ...rewards,
+      { level: parseInt(newReward.level, 10), roleId: newReward.roleId },
+    ];
+    handleNestedChange("leveling", "roleRewards", updatedRewards);
+    setNewReward({ level: "", roleId: "" });
   };
 
   const handleDeleteReward = (index: number) => {
     if (!settings) return;
-    const rewards = Array.isArray(settings.levelingRoleRewards) ? settings.levelingRoleRewards : [];
+    const rewards = settings.leveling.roleRewards;
     const updatedRewards = rewards.filter((_, i) => i !== index);
-    setSettings({ ...settings, levelingRoleRewards: updatedRewards });
+    handleNestedChange("leveling", "roleRewards", updatedRewards);
   };
 
   if (loading) return <Spinner />;
-  if (!selectedServer) return <div className="text-center text-text-secondary">Please select a server to manage its settings.</div>;
-  if (!settings) return <div>Failed to load settings for {selectedServer.name}.</div>;
-  
-  const sortedChannels = metadata?.channels?.slice().sort((a, b) => a.name.localeCompare(b.name)) || [];
-  const sortedRoles = metadata?.roles?.slice().sort((a, b) => a.name.localeCompare(b.name)) || [];
+  if (!selectedServer)
+    return (
+      <div className="text-center text-text-secondary">
+        Please select a server to manage its settings.
+      </div>
+    );
+  if (!settings)
+    return <div>Failed to load settings for {selectedServer.name}.</div>;
+
+  const sortedChannels =
+    metadata?.channels?.slice().sort((a, b) => a.name.localeCompare(b.name)) ||
+    [];
+  const sortedRoles =
+    metadata?.roles?.slice().sort((a, b) => a.name.localeCompare(b.name)) || [];
+
+  const handleBlacklistToggle = (channelId: string) => {
+    if (!settings) return;
+    const currentBlacklist = settings.leveling.blacklistedChannels || [];
+    const isBlacklisted = currentBlacklist.includes(channelId);
+    const newBlacklist = isBlacklisted
+      ? currentBlacklist.filter((id) => id !== channelId)
+      : [...currentBlacklist, channelId];
+    handleNestedChange("leveling", "blacklistedChannels", newBlacklist);
+  };
 
   const renderContent = () => {
+    const filteredChannels = sortedChannels.filter((channel) =>
+      channel.name.toLowerCase().includes(blacklistSearch.toLowerCase())
+    );
+
+    const handleSelectAllVisible = () => {
+      if (!settings) return;
+      const visibleIds = filteredChannels.map((c) => c.id);
+      const currentBlacklist = settings.leveling.blacklistedChannels || [];
+      const newBlacklist = [...new Set([...currentBlacklist, ...visibleIds])];
+      handleNestedChange("leveling", "blacklistedChannels", newBlacklist);
+    };
+
+    const handleDeselectAllVisible = () => {
+      if (!settings) return;
+      const visibleIdsSet = new Set(filteredChannels.map((c) => c.id));
+      const currentBlacklist = settings.leveling.blacklistedChannels || [];
+      const newBlacklist = currentBlacklist.filter(
+        (id) => !visibleIdsSet.has(id)
+      );
+      handleNestedChange("leveling", "blacklistedChannels", newBlacklist);
+    };
+
     switch (activeTab) {
-      case 'general':
+      case "general":
         return (
           <div className="space-y-8">
             <div className="border-b border-gray-700/50 pb-8">
-              <h3 className="text-xl font-semibold text-text-primary mb-1">Welcome Messages</h3>
-              <p className="text-text-secondary mb-4">Greet new members when they join the server.</p>
-              <div className="flex items-center justify-between mb-4"><label htmlFor="welcomeMessageEnabled" className="font-medium text-text-primary">Enable Welcome Messages</label><ToggleSwitch enabled={settings.welcomeMessageEnabled} onChange={(val) => handleToggleChange('welcomeMessageEnabled', val)} /></div>
-              {settings.welcomeMessageEnabled && (
+              <h3 className="text-xl font-semibold text-text-primary mb-1">
+                Welcome Messages
+              </h3>
+              <p className="text-text-secondary mb-4">
+                Greet new members when they join the server.
+              </p>
+              <div className="flex items-center justify-between mb-4">
+                <label className="font-medium text-text-primary">
+                  Enable Welcome Messages
+                </label>
+                <ToggleSwitch
+                  enabled={settings.welcome.enabled}
+                  onChange={(val) =>
+                    handleNestedChange("welcome", "enabled", val)
+                  }
+                />
+              </div>
+              {settings.welcome.enabled && (
                 <div className="space-y-4">
                   <div>
-                    <label htmlFor="welcomeChannelId" className="block text-sm font-medium text-text-secondary mb-1">Welcome Channel</label>
-                    <select name="welcomeChannelId" id="welcomeChannelId" value={settings.welcomeChannelId} onChange={handleInputChange} className="w-full bg-background border border-gray-600 rounded-md p-2 focus:ring-primary focus:border-primary"><option value="">Select a channel</option>{sortedChannels.map(c => <option key={c.id} value={c.id}>#{c.name}</option>)}</select>
+                    <label className="block text-sm font-medium text-text-secondary mb-1">
+                      Welcome Channel
+                    </label>
+                    <select
+                      name="channelId"
+                      value={settings.welcome.channelId}
+                      onChange={(e) =>
+                        handleNestedChange(
+                          "welcome",
+                          "channelId",
+                          e.target.value
+                        )
+                      }
+                      className="w-full bg-background border border-gray-600 rounded-md p-2 focus:ring-primary focus:border-primary"
+                    >
+                      <option value="">Select a channel</option>
+                      {sortedChannels.map((c) => (
+                        <option key={c.id} value={c.id}>
+                          #{c.name}
+                        </option>
+                      ))}
+                    </select>
                   </div>
                   <div>
-                    <label htmlFor="welcomeMessage" className="block text-sm font-medium text-text-secondary mb-1">Welcome Message</label>
-                    <textarea name="welcomeMessage" id="welcomeMessage" value={settings.welcomeMessage} onChange={handleInputChange} rows={3} className="w-full bg-background border border-gray-600 rounded-md p-2 focus:ring-primary focus:border-primary"></textarea>
-                    <p className="text-xs text-text-secondary mt-1">Use `{'`{user}`'}` as a placeholder for the username.</p>
+                    <label className="block text-sm font-medium text-text-secondary mb-1">
+                      Welcome Message
+                    </label>
+                    <textarea
+                      name="message"
+                      value={settings.welcome.message}
+                      onChange={(e) =>
+                        handleNestedChange("welcome", "message", e.target.value)
+                      }
+                      rows={3}
+                      className="w-full bg-background border border-gray-600 rounded-md p-2 focus:ring-primary focus:border-primary"
+                    ></textarea>
+                    <p className="text-xs text-text-secondary mt-1">
+                      Use `{"`{user}`"}` as a placeholder for the username.
+                    </p>
                   </div>
                 </div>
               )}
             </div>
             <div>
-              <h3 className="text-xl font-semibold text-text-primary mb-1">Goodbye Messages</h3>
-              <p className="text-text-secondary mb-4">Announce when a member leaves the server.</p>
-              <div className="flex items-center justify-between mb-4"><label htmlFor="goodbyeMessageEnabled" className="font-medium text-text-primary">Enable Goodbye Messages</label><ToggleSwitch enabled={settings.goodbyeMessageEnabled} onChange={(val) => handleToggleChange('goodbyeMessageEnabled', val)} /></div>
-              {settings.goodbyeMessageEnabled && (
+              <h3 className="text-xl font-semibold text-text-primary mb-1">
+                Goodbye Messages
+              </h3>
+              <p className="text-text-secondary mb-4">
+                Announce when a member leaves the server.
+              </p>
+              <div className="flex items-center justify-between mb-4">
+                <label className="font-medium text-text-primary">
+                  Enable Goodbye Messages
+                </label>
+                <ToggleSwitch
+                  enabled={settings.goodbye.enabled}
+                  onChange={(val) =>
+                    handleNestedChange("goodbye", "enabled", val)
+                  }
+                />
+              </div>
+              {settings.goodbye.enabled && (
                 <div className="space-y-4">
                   <div>
-                    <label htmlFor="goodbyeChannelId" className="block text-sm font-medium text-text-secondary mb-1">Goodbye Channel</label>
-                    <select name="goodbyeChannelId" id="goodbyeChannelId" value={settings.goodbyeChannelId} onChange={handleInputChange} className="w-full bg-background border border-gray-600 rounded-md p-2 focus:ring-primary focus:border-primary"><option value="">Select a channel</option>{sortedChannels.map(c => <option key={c.id} value={c.id}>#{c.name}</option>)}</select>
+                    <label className="block text-sm font-medium text-text-secondary mb-1">
+                      Goodbye Channel
+                    </label>
+                    <select
+                      name="channelId"
+                      value={settings.goodbye.channelId}
+                      onChange={(e) =>
+                        handleNestedChange(
+                          "goodbye",
+                          "channelId",
+                          e.target.value
+                        )
+                      }
+                      className="w-full bg-background border border-gray-600 rounded-md p-2 focus:ring-primary focus:border-primary"
+                    >
+                      <option value="">Select a channel</option>
+                      {sortedChannels.map((c) => (
+                        <option key={c.id} value={c.id}>
+                          #{c.name}
+                        </option>
+                      ))}
+                    </select>
                   </div>
                   <div>
-                    <label htmlFor="goodbyeMessage" className="block text-sm font-medium text-text-secondary mb-1">Goodbye Message</label>
-                    <textarea name="goodbyeMessage" id="goodbyeMessage" value={settings.goodbyeMessage} onChange={handleInputChange} rows={3} className="w-full bg-background border border-gray-600 rounded-md p-2 focus:ring-primary focus:border-primary"></textarea>
-                     <p className="text-xs text-text-secondary mt-1">Use `{'`{user}`'}` as a placeholder for the username.</p>
+                    <label className="block text-sm font-medium text-text-secondary mb-1">
+                      Goodbye Message
+                    </label>
+                    <textarea
+                      name="message"
+                      value={settings.goodbye.message}
+                      onChange={(e) =>
+                        handleNestedChange("goodbye", "message", e.target.value)
+                      }
+                      rows={3}
+                      className="w-full bg-background border border-gray-600 rounded-md p-2 focus:ring-primary focus:border-primary"
+                    ></textarea>
+                    <p className="text-xs text-text-secondary mt-1">
+                      Use `{"`{user}`"}` as a placeholder for the username.
+                    </p>
                   </div>
                 </div>
               )}
             </div>
           </div>
         );
-      case 'roles':
+      case "roles":
         return (
           <div>
             <div>
-              <h3 className="text-xl font-semibold text-text-primary mb-1">Auto Role</h3>
-              <p className="text-text-secondary mb-4">Automatically assign a role to new members.</p>
-              <div className="flex items-center justify-between mb-4"><label htmlFor="autoRoleEnabled" className="font-medium text-text-primary">Enable Auto Role</label><ToggleSwitch enabled={settings.autoRoleEnabled} onChange={(val) => handleToggleChange('autoRoleEnabled', val)} /></div>
-              {settings.autoRoleEnabled && (
+              <h3 className="text-xl font-semibold text-text-primary mb-1">
+                Auto Role
+              </h3>
+              <p className="text-text-secondary mb-4">
+                Automatically assign a role to new members.
+              </p>
+              <div className="flex items-center justify-between mb-4">
+                <label className="font-medium text-text-primary">
+                  Enable Auto Role
+                </label>
+                <ToggleSwitch
+                  enabled={settings.autoRole.enabled}
+                  onChange={(val) =>
+                    handleNestedChange("autoRole", "enabled", val)
+                  }
+                />
+              </div>
+              {settings.autoRole.enabled && (
                 <div>
-                  <label htmlFor="autoRoleRoleId" className="block text-sm font-medium text-text-secondary mb-1">Member Role</label>
-                  <select name="autoRoleRoleId" id="autoRoleRoleId" value={settings.autoRoleRoleId} onChange={handleInputChange} className="w-full bg-background border border-gray-600 rounded-md p-2 focus:ring-primary focus:border-primary"><option value="">Select a role</option>{sortedRoles.map(r => <option key={r.id} value={r.id}>@{r.name}</option>)}</select>
+                  <label className="block text-sm font-medium text-text-secondary mb-1">
+                    Member Role
+                  </label>
+                  <select
+                    name="roleId"
+                    value={settings.autoRole.roleId}
+                    onChange={(e) =>
+                      handleNestedChange("autoRole", "roleId", e.target.value)
+                    }
+                    className="w-full bg-background border border-gray-600 rounded-md p-2 focus:ring-primary focus:border-primary"
+                  >
+                    <option value="">Select a role</option>
+                    {sortedRoles.map((r) => (
+                      <option key={r.id} value={r.id}>
+                        @{r.name}
+                      </option>
+                    ))}
+                  </select>
                 </div>
               )}
             </div>
           </div>
         );
-      case 'moderation':
-        return (
-          <div>
-            <div>
-                <h3 className="text-xl font-semibold text-text-primary mb-1">AI-Powered Auto-Moderation</h3>
-                <p className="text-text-secondary mb-4">Use AI to automatically detect and delete inappropriate messages (e.g., spam, toxicity). A warning will be sent to the user.</p>
-                <div className="flex items-center justify-between mb-4"><label htmlFor="aiAutoModEnabled" className="font-medium text-text-primary">Enable AI Auto-Moderation</label><ToggleSwitch enabled={settings.aiAutoModEnabled} onChange={(val) => handleToggleChange('aiAutoModEnabled', val)} /></div>
-                 <p className="text-xs text-text-secondary mt-2">Note: AI is not perfect and may have false positives. Flagged messages are recorded in the Audit Log.</p>
-            </div>
-          </div>
-        );
-       case 'leveling':
+      case "leveling":
         return (
           <div className="space-y-8">
             <div className="border-b border-gray-700/50 pb-8">
-              <h3 className="text-xl font-semibold text-text-primary mb-1">Leveling System</h3>
-              <p className="text-text-secondary mb-4">Reward active members with XP and levels for chatting.</p>
-              <div className="flex items-center justify-between mb-4"><label htmlFor="levelingEnabled" className="font-medium text-text-primary">Enable Leveling System</label><ToggleSwitch enabled={settings.levelingEnabled} onChange={(val) => handleToggleChange('levelingEnabled', val)} /></div>
-              {settings.levelingEnabled && (
+              <h3 className="text-xl font-semibold text-text-primary mb-1">
+                Leveling System
+              </h3>
+              <p className="text-text-secondary mb-4">
+                Reward active members with XP and levels for chatting.
+              </p>
+              <div className="flex items-center justify-between mb-4">
+                <label className="font-medium text-text-primary">
+                  Enable Leveling System
+                </label>
+                <ToggleSwitch
+                  enabled={settings.leveling.enabled}
+                  onChange={(val) =>
+                    handleNestedChange("leveling", "enabled", val)
+                  }
+                />
+              </div>
+              {settings.leveling.enabled && (
                 <div className="space-y-4">
                   <div>
-                    <label htmlFor="levelUpChannelId" className="block text-sm font-medium text-text-secondary mb-1">Level-up Announcement Channel (Optional)</label>
-                    <select name="levelUpChannelId" id="levelUpChannelId" value={settings.levelUpChannelId} onChange={handleInputChange} className="w-full bg-background border border-gray-600 rounded-md p-2 focus:ring-primary focus:border-primary"><option value="">Disable announcements</option>{sortedChannels.map(c => <option key={c.id} value={c.id}>#{c.name}</option>)}</select>
+                    <label className="block text-sm font-medium text-text-secondary mb-1">
+                      Level-up Announcement Channel (Optional)
+                    </label>
+                    <select
+                      name="channelId"
+                      value={settings.leveling.channelId}
+                      onChange={(e) =>
+                        handleNestedChange(
+                          "leveling",
+                          "channelId",
+                          e.target.value
+                        )
+                      }
+                      className="w-full bg-background border border-gray-600 rounded-md p-2 focus:ring-primary focus:border-primary"
+                    >
+                      <option value="">Disable announcements</option>
+                      {sortedChannels.map((c) => (
+                        <option key={c.id} value={c.id}>
+                          #{c.name}
+                        </option>
+                      ))}
+                    </select>
                   </div>
                   <div>
-                    <label htmlFor="levelUpMessage" className="block text-sm font-medium text-text-secondary mb-1">Level-up Message</label>
-                    <textarea name="levelUpMessage" id="levelUpMessage" value={settings.levelUpMessage} onChange={handleInputChange} rows={3} className="w-full bg-background border border-gray-600 rounded-md p-2 focus:ring-primary focus:border-primary"></textarea>
-                    <p className="text-xs text-text-secondary mt-1">Use `{'`{user}`'}` for username and `{'`{level}`'}` for the new level.</p>
+                    <label className="block text-sm font-medium text-text-secondary mb-1">
+                      Level-up Message
+                    </label>
+                    <textarea
+                      name="message"
+                      value={settings.leveling.message}
+                      onChange={(e) =>
+                        handleNestedChange(
+                          "leveling",
+                          "message",
+                          e.target.value
+                        )
+                      }
+                      rows={3}
+                      className="w-full bg-background border border-gray-600 rounded-md p-2 focus:ring-primary focus:border-primary"
+                    ></textarea>
+                    <p className="text-xs text-text-secondary mt-1">
+                      Use `{"`{user}`"}` for username and `{"`{level}`"}` for
+                      the new level.
+                    </p>
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4">
-                     <div>
-                        <label htmlFor="levelingXpPerMessageMin" className="block text-sm font-medium text-text-secondary mb-1">Min XP / Message</label>
-                        <input type="number" name="levelingXpPerMessageMin" id="levelingXpPerMessageMin" value={settings.levelingXpPerMessageMin} onChange={handleInputChange} className="w-full bg-background border border-gray-600 rounded-md p-2"/>
-                     </div>
-                     <div>
-                        <label htmlFor="levelingXpPerMessageMax" className="block text-sm font-medium text-text-secondary mb-1">Max XP / Message</label>
-                        <input type="number" name="levelingXpPerMessageMax" id="levelingXpPerMessageMax" value={settings.levelingXpPerMessageMax} onChange={handleInputChange} className="w-full bg-background border border-gray-600 rounded-md p-2"/>
-                     </div>
-                     <div>
-                        <label htmlFor="levelingCooldownSeconds" className="block text-sm font-medium text-text-secondary mb-1">XP Cooldown (sec)</label>
-                        <input type="number" name="levelingCooldownSeconds" id="levelingCooldownSeconds" value={settings.levelingCooldownSeconds} onChange={handleInputChange} className="w-full bg-background border border-gray-600 rounded-md p-2"/>
-                     </div>
+                    <div>
+                      <label className="block text-sm font-medium text-text-secondary mb-1">
+                        Min XP / Message
+                      </label>
+                      <input
+                        type="number"
+                        name="xpPerMessageMin"
+                        value={settings.leveling.xpPerMessageMin}
+                        onChange={(e) =>
+                          handleNestedChange(
+                            "leveling",
+                            "xpPerMessageMin",
+                            e.target.value
+                          )
+                        }
+                        className="w-full bg-background border border-gray-600 rounded-md p-2"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-text-secondary mb-1">
+                        Max XP / Message
+                      </label>
+                      <input
+                        type="number"
+                        name="xpPerMessageMax"
+                        value={settings.leveling.xpPerMessageMax}
+                        onChange={(e) =>
+                          handleNestedChange(
+                            "leveling",
+                            "xpPerMessageMax",
+                            e.target.value
+                          )
+                        }
+                        className="w-full bg-background border border-gray-600 rounded-md p-2"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-text-secondary mb-1">
+                        XP Cooldown (sec)
+                      </label>
+                      <input
+                        type="number"
+                        name="cooldownSeconds"
+                        value={settings.leveling.cooldownSeconds}
+                        onChange={(e) =>
+                          handleNestedChange(
+                            "leveling",
+                            "cooldownSeconds",
+                            e.target.value
+                          )
+                        }
+                        className="w-full bg-background border border-gray-600 rounded-md p-2"
+                      />
+                    </div>
                   </div>
-                   <div>
-                        <label htmlFor="levelingBlacklistedChannels" className="block text-sm font-medium text-text-secondary mb-1">Blacklisted Channels (No XP)</label>
-                        <select
-                            multiple
-                            name="levelingBlacklistedChannels"
-                            id="levelingBlacklistedChannels"
-                            value={settings.levelingBlacklistedChannels as string[]}
-                            onChange={(e) => handleMultiSelectChange('levelingBlacklistedChannels', Array.from(e.target.selectedOptions, option => option.value))}
-                            className="w-full h-32 bg-background border border-gray-600 rounded-md p-2 focus:ring-primary focus:border-primary"
+                  <div>
+                    <label className="block text-sm font-medium text-text-secondary mb-2">
+                      Blacklisted Channels (No XP)
+                    </label>
+                    <div className="bg-secondary/50 p-3 rounded-md">
+                      <div className="flex gap-2 mb-2">
+                        <input
+                          type="text"
+                          placeholder="Search channels..."
+                          value={blacklistSearch}
+                          onChange={(e) => setBlacklistSearch(e.target.value)}
+                          className="w-full bg-background border border-gray-600 rounded-md p-2 focus:ring-primary focus:border-primary text-sm"
+                        />
+                        <button
+                          type="button"
+                          onClick={handleSelectAllVisible}
+                          className="text-xs bg-secondary whitespace-nowrap text-text-primary px-3 py-1 rounded-md hover:bg-surface"
                         >
-                            {sortedChannels.map(c => <option key={c.id} value={c.id}>#{c.name}</option>)}
-                        </select>
-                        <p className="text-xs text-text-secondary mt-1">Hold Ctrl/Cmd to select multiple channels.</p>
-                   </div>
+                          Select All
+                        </button>
+                        <button
+                          type="button"
+                          onClick={handleDeselectAllVisible}
+                          className="text-xs bg-secondary whitespace-nowrap text-text-primary px-3 py-1 rounded-md hover:bg-surface"
+                        >
+                          Deselect All
+                        </button>
+                      </div>
+
+                      <div className="h-40 overflow-y-auto bg-background border border-gray-600 rounded-md p-2 space-y-1">
+                        {filteredChannels.length > 0 ? (
+                          filteredChannels.map((channel) => (
+                            <div
+                              key={channel.id}
+                              className="flex items-center p-1.5 rounded-md hover:bg-secondary/60"
+                            >
+                              <input
+                                type="checkbox"
+                                id={`blacklist-${channel.id}`}
+                                checked={settings.leveling.blacklistedChannels.includes(
+                                  channel.id
+                                )}
+                                onChange={() =>
+                                  handleBlacklistToggle(channel.id)
+                                }
+                                className="h-4 w-4 rounded bg-surface border-gray-500 text-primary focus:ring-primary cursor-pointer"
+                              />
+                              <label
+                                htmlFor={`blacklist-${channel.id}`}
+                                className="ml-3 block text-sm text-text-primary cursor-pointer"
+                              >
+                                #{channel.name}
+                              </label>
+                            </div>
+                          ))
+                        ) : (
+                          <div className="flex items-center justify-center h-full text-sm text-text-secondary">
+                            No channels found.
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
                 </div>
               )}
             </div>
-            {settings.levelingEnabled && (
-                 <div>
-                    <h3 className="text-xl font-semibold text-text-primary mb-1">Role Rewards</h3>
-                    <p className="text-text-secondary mb-4">Automatically grant roles to members when they reach a certain level.</p>
-                    <div className="space-y-2 mb-4">
-                        {(Array.isArray(settings.levelingRoleRewards) && settings.levelingRoleRewards.length > 0) ? (
-                            settings.levelingRoleRewards.map((reward, index) => {
-                                const role = metadata?.roles.find(r => r.id === reward.roleId);
-                                return (
-                                <div key={index} className="flex items-center justify-between bg-secondary p-2 rounded-md">
-                                    <p>Level <span className="font-bold text-accent">{reward.level}</span> → <span className="font-medium" style={{ color: role ? `#${role.color.toString(16).padStart(6, '0')}` : 'inherit'}}>@{role?.name || 'Unknown Role'}</span></p>
-                                    <button type="button" onClick={() => handleDeleteReward(index)} className="text-red-400 hover:text-red-300"><svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" /></svg></button>
-                                </div>
-                            )})
-                        ) : ( <p className="text-sm text-text-secondary">No role rewards configured.</p> )}
-                    </div>
-                    <div className="flex items-end gap-2 p-3 bg-secondary/50 rounded-md">
-                        <div className="flex-1">
-                            <label className="block text-xs font-medium text-text-secondary mb-1">Required Level</label>
-                            <input type="number" placeholder="e.g., 10" value={newReward.level} onChange={(e) => setNewReward({...newReward, level: e.target.value})} className="w-full bg-background border border-gray-600 rounded-md p-2 focus:ring-primary focus:border-primary" />
-                        </div>
-                         <div className="flex-1">
-                            <label className="block text-xs font-medium text-text-secondary mb-1">Role to Grant</label>
-                            <select value={newReward.roleId} onChange={(e) => setNewReward({...newReward, roleId: e.target.value})} className="w-full bg-background border border-gray-600 rounded-md p-2 focus:ring-primary focus:border-primary"><option value="">Select a role</option>{sortedRoles.map(r => <option key={r.id} value={r.id}>@{r.name}</option>)}</select>
-                        </div>
-                        <button type="button" onClick={handleAddReward} className="bg-primary text-white font-bold py-2 px-4 rounded-md hover:bg-opacity-80 transition-colors">Add</button>
-                    </div>
+            {settings.leveling.enabled && (
+              <div>
+                <h3 className="text-xl font-semibold text-text-primary mb-1">
+                  Role Rewards
+                </h3>
+                <p className="text-text-secondary mb-4">
+                  Automatically grant roles to members when they reach a certain
+                  level.
+                </p>
+                <div className="space-y-2 mb-4">
+                  {settings.leveling.roleRewards.length > 0 ? (
+                    settings.leveling.roleRewards
+                      .sort((a, b) => a.level - b.level)
+                      .map((reward, index) => {
+                        const role = metadata?.roles.find(
+                          (r) => r.id === reward.roleId
+                        );
+                        return (
+                          <div
+                            key={index}
+                            className="flex items-center justify-between bg-secondary p-2 rounded-md"
+                          >
+                            <p>
+                              Level{" "}
+                              <span className="font-bold text-accent">
+                                {reward.level}
+                              </span>{" "}
+                              →{" "}
+                              <span
+                                className="font-medium"
+                                style={{
+                                  color: role
+                                    ? `#${role.color
+                                        .toString(16)
+                                        .padStart(6, "0")}`
+                                    : "inherit",
+                                }}
+                              >
+                                @{role?.name || "Unknown Role"}
+                              </span>
+                            </p>
+                            <button
+                              type="button"
+                              onClick={() => handleDeleteReward(index)}
+                              className="text-red-400 hover:text-red-300"
+                            >
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                className="h-5 w-5"
+                                viewBox="0 0 20 20"
+                                fill="currentColor"
+                              >
+                                <path
+                                  fillRule="evenodd"
+                                  d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                                  clipRule="evenodd"
+                                />
+                              </svg>
+                            </button>
+                          </div>
+                        );
+                      })
+                  ) : (
+                    <p className="text-sm text-text-secondary">
+                      No role rewards configured.
+                    </p>
+                  )}
                 </div>
+                <div className="flex items-end gap-2 p-3 bg-secondary/50 rounded-md">
+                  <div className="flex-1">
+                    <label className="block text-xs font-medium text-text-secondary mb-1">
+                      Required Level
+                    </label>
+                    <input
+                      type="number"
+                      placeholder="e.g., 10"
+                      value={newReward.level}
+                      onChange={(e) =>
+                        setNewReward({ ...newReward, level: e.target.value })
+                      }
+                      className="w-full bg-background border border-gray-600 rounded-md p-2 focus:ring-primary focus:border-primary"
+                    />
+                  </div>
+                  <div className="flex-1">
+                    <label className="block text-xs font-medium text-text-secondary mb-1">
+                      Role to Grant
+                    </label>
+                    <select
+                      value={newReward.roleId}
+                      onChange={(e) =>
+                        setNewReward({ ...newReward, roleId: e.target.value })
+                      }
+                      className="w-full bg-background border border-gray-600 rounded-md p-2 focus:ring-primary focus:border-primary"
+                    >
+                      <option value="">Select a role</option>
+                      {sortedRoles.map((r) => (
+                        <option key={r.id} value={r.id}>
+                          @{r.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handleAddReward}
+                    className="bg-primary text-white font-bold py-2 px-4 rounded-md hover:bg-opacity-80 transition-colors"
+                  >
+                    Add
+                  </button>
+                </div>
+              </div>
             )}
           </div>
         );
-      default: return null;
+      default:
+        return null;
     }
   };
-  
-  const TabButton = ({ tab, children }: { tab: Tab, children: React.ReactNode }) => ( <button type="button" onClick={() => setActiveTab(tab)} className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors duration-200 focus:outline-none ${ activeTab === tab ? 'border-primary text-primary' : 'border-transparent text-text-secondary hover:text-text-primary hover:border-gray-500' }`}>{children}</button> );
+
+  const TabButton = ({
+    tab,
+    children,
+  }: {
+    tab: Tab;
+    children: React.ReactNode;
+  }) => (
+    <button
+      type="button"
+      onClick={() => setActiveTab(tab)}
+      className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors duration-200 focus:outline-none ${
+        activeTab === tab
+          ? "border-primary text-primary"
+          : "border-transparent text-text-secondary hover:text-text-primary hover:border-gray-500"
+      }`}
+    >
+      {children}
+    </button>
+  );
 
   return (
     <div className="max-w-4xl mx-auto">
       <form onSubmit={handleSave} className="bg-surface rounded-lg shadow-lg">
-        <div className="px-8 border-b border-gray-700"><nav className="-mb-px flex space-x-6" aria-label="Tabs"><TabButton tab="general">General</TabButton><TabButton tab="roles">Roles</TabButton><TabButton tab="leveling">Leveling</TabButton><TabButton tab="moderation">Moderation</TabButton></nav></div>
+        <div className="px-8 border-b border-gray-700">
+          <nav className="-mb-px flex space-x-6" aria-label="Tabs">
+            <TabButton tab="general">General</TabButton>
+            <TabButton tab="roles">Roles</TabButton>
+            <TabButton tab="leveling">Leveling</TabButton>
+          </nav>
+        </div>
         <div className="p-8 min-h-[420px]">{renderContent()}</div>
-        <div className="flex justify-end items-center gap-4 px-8 py-4 bg-secondary/30 rounded-b-lg border-t border-gray-700"><button type="submit" disabled={saving || loading} className="bg-primary text-white font-bold py-2 px-6 rounded-md hover:bg-opacity-80 transition-colors disabled:bg-gray-500 disabled:cursor-not-allowed">{saving ? 'Saving...' : 'Save Changes'}</button></div>
+        <div className="flex justify-end items-center gap-4 px-8 py-4 bg-secondary/30 rounded-b-lg border-t border-gray-700">
+          <button
+            type="submit"
+            disabled={saving || loading}
+            className="bg-primary text-white font-bold py-2 px-6 rounded-md hover:bg-opacity-80 transition-colors disabled:bg-gray-500 disabled:cursor-not-allowed"
+          >
+            {saving ? "Saving..." : "Save Changes"}
+          </button>
+        </div>
       </form>
     </div>
   );

@@ -7,6 +7,7 @@ import { appwriteService } from '../services/appwrite';
 import { ServerStats, LogEntry, CommandLogEntry, LogType } from '../types';
 import { ICONS } from '../constants';
 import { useServer } from '../contexts/ServerContext';
+import RoleDistributionChart from '../components/RoleDistributionChart';
 
 export type ActivityItem = {
     id: string;
@@ -44,14 +45,32 @@ const DashboardPage: React.FC = () => {
         
         setStats(statsData);
 
-        const mappedAuditLogs: ActivityItem[] = auditLogs.map((log: LogEntry) => ({
-            id: log.id,
-            type: 'audit',
-            logType: log.type,
-            timestamp: log.timestamp,
-            icon: log.type === LogType.AI_MODERATION ? ICONS.shield : ICONS.auditLog,
-            text: <><span className="font-bold">{log.user}</span> {log.type === LogType.AI_MODERATION ? `had a message flagged by AI.` : `triggered a ${log.type.toLowerCase().replace(/_/g, ' ')} event.`}</>
-        }));
+        const mappedAuditLogs: ActivityItem[] = auditLogs.map((log: LogEntry) => {
+            let logText: React.ReactNode;
+            let icon = ICONS.auditLog;
+
+            switch(log.type) {
+                case LogType.AI_MODERATION:
+                    logText = <><span className="font-bold">{log.user}</span> had a message flagged by AI.</>;
+                    icon = ICONS.shield;
+                    break;
+                case LogType.AUTO_MOD_ACTION:
+                     logText = <><span className="font-bold">AutoMod</span> took action on <span className="font-bold">{log.user}</span>.</>;
+                     icon = ICONS.autoMod;
+                     break;
+                default:
+                    logText = <><span className="font-bold">{log.user}</span> triggered a {log.type.toLowerCase().replace(/_/g, ' ')} event.</>;
+            }
+            
+            return {
+                id: log.id,
+                type: 'audit' as 'audit',
+                logType: log.type,
+                timestamp: log.timestamp,
+                icon: icon,
+                text: logText
+            };
+        });
 
         const mappedCommandLogs: ActivityItem[] = commandLogs.map((log: CommandLogEntry) => ({
             id: log.id,
@@ -118,20 +137,39 @@ const DashboardPage: React.FC = () => {
           colorClass="bg-yellow-500"
         />
         <StatCard 
-          title="Custom Commands" 
-          value={stats.commandCount}
-          icon={<svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>}
-          colorClass="bg-purple-500"
+          title="Total Warnings" 
+          value={stats.totalWarnings}
+          icon={<svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>}
+          colorClass="bg-red-500"
         />
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div className="lg:col-span-2">
+      <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
+        <div className="lg:col-span-3">
             <AnalyticsChart data={stats.messagesWeekly} />
         </div>
-        <div className="lg:col-span-1">
+        <div className="lg:col-span-2">
             <RecentActivity items={activity} />
         </div>
+      </div>
+      <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
+         <div className="lg:col-span-2">
+            <RoleDistributionChart data={Array.isArray(stats.roleDistribution) ? stats.roleDistribution : []} />
+         </div>
+         <div className="lg:col-span-3">
+             <div className="bg-surface p-6 rounded-lg shadow-lg h-full">
+                <h3 className="text-lg font-semibold mb-4 text-text-primary">Quick Actions</h3>
+                <div className="grid grid-cols-2 gap-4">
+                    <StatCard 
+                        title="Custom Commands" 
+                        value={stats.commandCount}
+                        icon={<svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>}
+                        colorClass="bg-purple-500"
+                    />
+                    {/* Placeholder for another quick action card */}
+                </div>
+            </div>
+         </div>
       </div>
     </div>
   );

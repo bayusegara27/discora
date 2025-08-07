@@ -18,7 +18,13 @@ export const SYSTEM_STATUS_COLLECTION_ID = 'system_status';
 export const USER_LEVELS_COLLECTION_ID = 'user_levels'; 
 export const MODERATION_QUEUE_COLLECTION_ID = 'moderation_queue';
 export const MEMBERS_COLLECTION_ID = 'members';
-export const SERVER_METADATA_COLLECTION_ID = 'server_metadata'; // New
+export const SERVER_METADATA_COLLECTION_ID = 'server_metadata';
+export const REACTION_ROLES_COLLECTION_ID = 'reaction_roles';
+export const SCHEDULED_MESSAGES_COLLECTION_ID = 'scheduled_messages';
+export const GIVEAWAYS_COLLECTION_ID = 'giveaways';
+export const REACTION_ROLE_QUEUE_COLLECTION_ID = 'reaction_role_queue';
+export const GIVEAWAY_QUEUE_COLLECTION_ID = 'giveaway_queue';
+export const MUSIC_QUEUE_COLLECTION_ID = 'music_queue';
 
 
 // --- Appwrite Client Initialization ---
