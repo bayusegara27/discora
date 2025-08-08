@@ -217,6 +217,7 @@ async function setup() {
         inviteFilterEnabled: false,
         mentionSpamEnabled: false,
         mentionSpamLimit: 5,
+        ignoreAdmins: true,
     });
     const settingsAttributes = [
       { key: "guildId", type: "string", size: 32, required: true },

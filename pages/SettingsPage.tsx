@@ -26,9 +26,8 @@ const SettingsPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const { addToast } = useToast();
-  const [activeTab, setActiveTab] = useState<Tab>("leveling");
+  const [activeTab, setActiveTab] = useState<Tab>("general");
   const [newReward, setNewReward] = useState({ level: "", roleId: "" });
-  const [blacklistSearch, setBlacklistSearch] = useState("");
 
   useEffect(() => {
     if (!selectedServer) {
@@ -130,39 +129,7 @@ const SettingsPage: React.FC = () => {
   const sortedRoles =
     metadata?.roles?.slice().sort((a, b) => a.name.localeCompare(b.name)) || [];
 
-  const handleBlacklistToggle = (channelId: string) => {
-    if (!settings) return;
-    const currentBlacklist = settings.leveling.blacklistedChannels || [];
-    const isBlacklisted = currentBlacklist.includes(channelId);
-    const newBlacklist = isBlacklisted
-      ? currentBlacklist.filter((id) => id !== channelId)
-      : [...currentBlacklist, channelId];
-    handleNestedChange("leveling", "blacklistedChannels", newBlacklist);
-  };
-
   const renderContent = () => {
-    const filteredChannels = sortedChannels.filter((channel) =>
-      channel.name.toLowerCase().includes(blacklistSearch.toLowerCase())
-    );
-
-    const handleSelectAllVisible = () => {
-      if (!settings) return;
-      const visibleIds = filteredChannels.map((c) => c.id);
-      const currentBlacklist = settings.leveling.blacklistedChannels || [];
-      const newBlacklist = [...new Set([...currentBlacklist, ...visibleIds])];
-      handleNestedChange("leveling", "blacklistedChannels", newBlacklist);
-    };
-
-    const handleDeselectAllVisible = () => {
-      if (!settings) return;
-      const visibleIdsSet = new Set(filteredChannels.map((c) => c.id));
-      const currentBlacklist = settings.leveling.blacklistedChannels || [];
-      const newBlacklist = currentBlacklist.filter(
-        (id) => !visibleIdsSet.has(id)
-      );
-      handleNestedChange("leveling", "blacklistedChannels", newBlacklist);
-    };
-
     switch (activeTab) {
       case "general":
         return (
@@ -469,67 +436,34 @@ const SettingsPage: React.FC = () => {
                     </div>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-text-secondary mb-2">
+                    <label className="block text-sm font-medium text-text-secondary mb-1">
                       Blacklisted Channels (No XP)
                     </label>
-                    <div className="bg-secondary/50 p-3 rounded-md">
-                      <div className="flex gap-2 mb-2">
-                        <input
-                          type="text"
-                          placeholder="Search channels..."
-                          value={blacklistSearch}
-                          onChange={(e) => setBlacklistSearch(e.target.value)}
-                          className="w-full bg-background border border-gray-600 rounded-md p-2 focus:ring-primary focus:border-primary text-sm"
-                        />
-                        <button
-                          type="button"
-                          onClick={handleSelectAllVisible}
-                          className="text-xs bg-secondary whitespace-nowrap text-text-primary px-3 py-1 rounded-md hover:bg-surface"
-                        >
-                          Select All
-                        </button>
-                        <button
-                          type="button"
-                          onClick={handleDeselectAllVisible}
-                          className="text-xs bg-secondary whitespace-nowrap text-text-primary px-3 py-1 rounded-md hover:bg-surface"
-                        >
-                          Deselect All
-                        </button>
-                      </div>
-
-                      <div className="h-40 overflow-y-auto bg-background border border-gray-600 rounded-md p-2 space-y-1">
-                        {filteredChannels.length > 0 ? (
-                          filteredChannels.map((channel) => (
-                            <div
-                              key={channel.id}
-                              className="flex items-center p-1.5 rounded-md hover:bg-secondary/60"
-                            >
-                              <input
-                                type="checkbox"
-                                id={`blacklist-${channel.id}`}
-                                checked={settings.leveling.blacklistedChannels.includes(
-                                  channel.id
-                                )}
-                                onChange={() =>
-                                  handleBlacklistToggle(channel.id)
-                                }
-                                className="h-4 w-4 rounded bg-surface border-gray-500 text-primary focus:ring-primary cursor-pointer"
-                              />
-                              <label
-                                htmlFor={`blacklist-${channel.id}`}
-                                className="ml-3 block text-sm text-text-primary cursor-pointer"
-                              >
-                                #{channel.name}
-                              </label>
-                            </div>
-                          ))
-                        ) : (
-                          <div className="flex items-center justify-center h-full text-sm text-text-secondary">
-                            No channels found.
-                          </div>
-                        )}
-                      </div>
-                    </div>
+                    <select
+                      multiple
+                      name="blacklistedChannels"
+                      value={settings.leveling.blacklistedChannels}
+                      onChange={(e) =>
+                        handleNestedChange(
+                          "leveling",
+                          "blacklistedChannels",
+                          Array.from(
+                            e.target.selectedOptions,
+                            (option) => option.value
+                          )
+                        )
+                      }
+                      className="w-full h-32 bg-background border border-gray-600 rounded-md p-2 focus:ring-primary focus:border-primary"
+                    >
+                      {sortedChannels.map((c) => (
+                        <option key={c.id} value={c.id}>
+                          #{c.name}
+                        </option>
+                      ))}
+                    </select>
+                    <p className="text-xs text-text-secondary mt-1">
+                      Hold Ctrl/Cmd to select multiple channels.
+                    </p>
                   </div>
                 </div>
               )}
@@ -545,57 +479,55 @@ const SettingsPage: React.FC = () => {
                 </p>
                 <div className="space-y-2 mb-4">
                   {settings.leveling.roleRewards.length > 0 ? (
-                    settings.leveling.roleRewards
-                      .sort((a, b) => a.level - b.level)
-                      .map((reward, index) => {
-                        const role = metadata?.roles.find(
-                          (r) => r.id === reward.roleId
-                        );
-                        return (
-                          <div
-                            key={index}
-                            className="flex items-center justify-between bg-secondary p-2 rounded-md"
-                          >
-                            <p>
-                              Level{" "}
-                              <span className="font-bold text-accent">
-                                {reward.level}
-                              </span>{" "}
-                              →{" "}
-                              <span
-                                className="font-medium"
-                                style={{
-                                  color: role
-                                    ? `#${role.color
-                                        .toString(16)
-                                        .padStart(6, "0")}`
-                                    : "inherit",
-                                }}
-                              >
-                                @{role?.name || "Unknown Role"}
-                              </span>
-                            </p>
-                            <button
-                              type="button"
-                              onClick={() => handleDeleteReward(index)}
-                              className="text-red-400 hover:text-red-300"
+                    settings.leveling.roleRewards.map((reward, index) => {
+                      const role = metadata?.roles.find(
+                        (r) => r.id === reward.roleId
+                      );
+                      return (
+                        <div
+                          key={index}
+                          className="flex items-center justify-between bg-secondary p-2 rounded-md"
+                        >
+                          <p>
+                            Level{" "}
+                            <span className="font-bold text-accent">
+                              {reward.level}
+                            </span>{" "}
+                            →{" "}
+                            <span
+                              className="font-medium"
+                              style={{
+                                color: role
+                                  ? `#${role.color
+                                      .toString(16)
+                                      .padStart(6, "0")}`
+                                  : "inherit",
+                              }}
                             >
-                              <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                className="h-5 w-5"
-                                viewBox="0 0 20 20"
-                                fill="currentColor"
-                              >
-                                <path
-                                  fillRule="evenodd"
-                                  d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-                                  clipRule="evenodd"
-                                />
-                              </svg>
-                            </button>
-                          </div>
-                        );
-                      })
+                              @{role?.name || "Unknown Role"}
+                            </span>
+                          </p>
+                          <button
+                            type="button"
+                            onClick={() => handleDeleteReward(index)}
+                            className="text-red-400 hover:text-red-300"
+                          >
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              className="h-5 w-5"
+                              viewBox="0 0 20 20"
+                              fill="currentColor"
+                            >
+                              <path
+                                fillRule="evenodd"
+                                d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                                clipRule="evenodd"
+                              />
+                            </svg>
+                          </button>
+                        </div>
+                      );
+                    })
                   ) : (
                     <p className="text-sm text-text-secondary">
                       No role rewards configured.

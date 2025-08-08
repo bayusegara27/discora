@@ -89,6 +89,7 @@ const defaultAutoModSettings: AutoModSettings = {
     inviteFilterEnabled: false,
     mentionSpamEnabled: false,
     mentionSpamLimit: 5,
+    ignoreAdmins: true,
 };
 
 const defaultFullSettings: Omit<ServerSettings, 'id' | 'guildId'> = {

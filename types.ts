@@ -47,6 +47,7 @@ export interface AutoModSettings {
     inviteFilterEnabled: boolean;
     mentionSpamEnabled: boolean;
     mentionSpamLimit: number;
+    ignoreAdmins: boolean;
 }
 
 // Replaces the old flat ServerSettings

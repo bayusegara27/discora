@@ -88,6 +88,22 @@ const AutoModPage: React.FC = () => {
       </div>
       <form onSubmit={handleSave} className="bg-surface rounded-lg shadow-lg">
         <div className="p-8 space-y-8">
+
+            {/* General Settings */}
+            <div className="border-b border-gray-700/50 pb-8">
+                <h3 className="text-xl font-semibold text-text-primary mb-1">General Settings</h3>
+                 <div className="flex items-center justify-between">
+                    <label className="font-medium text-text-primary flex items-center">
+                        Ignore Administrators
+                        <InfoTooltip text="If enabled, users with Administrator permissions will bypass all auto-moderation filters." />
+                    </label>
+                    <ToggleSwitch 
+                        enabled={settings.autoMod.ignoreAdmins} 
+                        onChange={(val) => handleAutoModChange('ignoreAdmins', val)} 
+                    />
+                </div>
+            </div>
+
             {/* AI Moderation */}
             <div className="border-b border-gray-700/50 pb-8">
                 <h3 className="text-xl font-semibold text-text-primary mb-1">Gemini AI Moderation</h3>
