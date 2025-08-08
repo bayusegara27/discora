@@ -24,7 +24,7 @@ import ModerationActionModal from './components/ModerationActionModal';
 import AutoModPage from './pages/AutoModPage';
 import ReactionRolesPage from './pages/ReactionRolesPage';
 import ScheduledMessagesPage from './pages/ScheduledMessagesPage';
-import GiveawaysPage from './pages/GiveawaysPage.tsx.tsx';
+import GiveawaysPage from './pages/GiveawaysPage';
 import MusicPage from './pages/MusicPage';
 
 
