@@ -42,7 +42,7 @@ const LoginPage: React.FC = () => {
             <div className="w-full max-w-md bg-surface p-8 rounded-lg shadow-lg">
                 <div className="text-center mb-8">
                     <h1 className="text-3xl font-bold text-text-primary">Welcome Back!</h1>
-                    <p className="text-text-secondary">Log in to manage your AuraBot.</p>
+                    <p className="text-text-secondary">Log in to manage your Discora.</p>
                 </div>
                 <form onSubmit={handleSubmit} className="space-y-6">
                     <div>

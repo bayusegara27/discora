@@ -40,7 +40,7 @@ const RegisterPage: React.FC = () => {
             <div className="w-full max-w-md bg-surface p-8 rounded-lg shadow-lg">
                 <div className="text-center mb-8">
                     <h1 className="text-3xl font-bold text-text-primary">Create Your Account</h1>
-                    <p className="text-text-secondary">Get started with AuraBot Dashboard.</p>
+                    <p className="text-text-secondary">Get started with Discora Dashboard.</p>
                 </div>
                 <form onSubmit={handleSubmit} className="space-y-6">
                     <div>

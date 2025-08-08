@@ -1,32 +1,48 @@
-# AuraBot Dashboard
 
-AuraBot Dashboard is a comprehensive web interface for managing the AuraBot Discord bot. It provides server administrators with a powerful set of tools to configure settings, monitor activity, and generate content, all from a clean and intuitive user interface.
+<div align="center">
+  <img src="https://raw.githubusercontent.com/nakumi/Discora-next/master/public/logo.png" alt="Discora Logo" width="150">
+  <h1 align="center">Discora Dashboard</h1>
+  <p align="center">
+    Your All-in-One Mission Control for the Discora Discord Bot.
+  </p>
+</div>
 
-The project is built on a modern technology stack, connecting a React-based frontend with a Node.js bot through a self-hosted Appwrite backend. This architecture ensures real-time updates and gives you full ownership of your data.
+---
 
-## Key Features
+**Discora Dashboard** is the web-based command center for your Discora bot. It transforms server management from a series of text commands into an intuitive and powerful visual experience. Built with a modern stack featuring React and Appwrite, it gives you full control and ownership over your bot's configuration and your community's data.
 
-- **Centralized Dashboard**: View real-time server statistics, including member counts, online status, and recent message activity.
-- **Server Configuration**: Easily manage settings for welcome/goodbye messages, automatic role assignments, and the server-wide leveling system.
-- **Content & Engagement Tools**:
-    - **Custom Commands**: Create, edit, and delete custom text commands.
-    - **YouTube Notifications**: Automatically announce new video uploads from specified YouTube channels.
-    - **AI Content Helper**: Leverage the Google Gemini API to generate announcements, event ideas, and polls.
-- **Moderation & Logging**:
-    - **Audit & Command Logs**: Access detailed logs for moderation actions, server events, and command usage.
-    - **Member Management**: Browse and search server members with options for moderation actions.
-    - **AI Auto-Moderation**: Automatically flag and remove messages containing spam or toxic content.
-- **Secure & Self-Hosted**: Features a complete authentication system and operates on your own Appwrite instance, ensuring your data remains private and secure.
+Stop guessing commands and editing configuration files. Start managing your server with a tool designed for clarity and power.
+
+<br/>
+
+*Placeholder for a screenshot of the dashboard.*
+<!-- ![Discora Dashboard Screenshot](link-to-your-screenshot.png) -->
+
+---
+
+## Feature Highlights
+
+- **Your Mission Control**: Get a bird's-eye view of your server with real-time stats on member counts, online status, message activity, and role distribution.
+- **Effortless Configuration**: Visually manage everything from welcome messages and auto-roles to a server-wide leveling system with role rewards.
+- **Boost Your Community**:
+    - **Custom Commands**: Easily create, edit, and delete text or embed commands without touching a line of code.
+    - **YouTube Notifications**: Keep your community engaged by automatically announcing new video uploads from your favorite channels.
+    - **Giveaways & Events**: Launch and manage giveaways directly from the dashboard.
+- **Keep Your Server Safe & Healthy**:
+    - **Advanced Auto-Mod**: Configure a multi-layered defense system with a banned words filter, link/invite blocking, and mention spam prevention.
+    - **AI-Powered Moderation**: Leverage the Google Gemini API to automatically detect and remove toxic or harmful messages.
+    - **Comprehensive Logs**: Review detailed audit logs for server events and command usage logs to understand community activity.
+- **Secure & Self-Hosted**: With a full authentication system running on your private Appwrite instance, your data remains yours.
 
 ## Technology Stack
 
-- **Frontend**: React, TypeScript, Vite, Tailwind CSS, Recharts
-- **Bot**: Node.js, Discord.js, node-cron
+- **Frontend**: React, TypeScript, Vite, Tailwind CSS
+- **Bot**: Node.js, Discord.js
 - **Backend & Database**: Appwrite (Self-Hosted)
 - **AI Services**: Google Gemini API
 
 ## Getting Started
 
-To set up the AuraBot Dashboard, you will need to configure the Appwrite backend, set up the Discord bot, and run the frontend application.
+Ready to take control of your Discord server? We've created a detailed guide to get you up and running in no time.
 
-**For a complete, step-by-step guide, please refer to the [SETUP.md](./SETUP.md) file.** It contains all the necessary instructions to get the project running.
+**➡️ Proceed to the [SETUP.md](./SETUP.md) for a full installation guide.**

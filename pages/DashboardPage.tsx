@@ -104,7 +104,7 @@ const DashboardPage: React.FC = () => {
   if (!selectedServer) {
     return (
         <div className="text-center text-text-secondary p-8">
-            <h2 className="text-2xl font-bold mb-2">Welcome to AuraBot</h2>
+            <h2 className="text-2xl font-bold mb-2">Welcome to Discora</h2>
             <p>Please select a server from the dropdown in the header to get started.</p>
         </div>
     );

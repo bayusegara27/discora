@@ -149,7 +149,7 @@ async function createIndex(databaseId, collectionId, index) {
 }
 
 async function setup() {
-  console.log("🚀 Starting AuraBot Appwrite setup...");
+  console.log("🚀 Starting Discora Appwrite setup...");
   try {
     try {
       await databases.get(APPWRITE_DATABASE_ID);
@@ -159,7 +159,7 @@ async function setup() {
     } catch (error) {
       if (error.code === 404) {
         console.log(`Creating database '${APPWRITE_DATABASE_ID}'...`);
-        await databases.create(APPWRITE_DATABASE_ID, "AuraBot DB");
+        await databases.create(APPWRITE_DATABASE_ID, "Discora DB");
         console.log(`👍 Database '${APPWRITE_DATABASE_ID}' created.`);
       } else {
         throw error;

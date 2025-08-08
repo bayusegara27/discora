@@ -130,12 +130,12 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, setOpen }) => {
     <div className={`flex flex-col w-64 bg-secondary text-text-primary p-4 space-y-6 transition-transform duration-300 ease-in-out fixed inset-y-0 left-0 z-30 transform ${isOpen ? 'translate-x-0' : '-translate-x-full'} md:relative md:translate-x-0`}>
       <div className="flex items-center space-x-3 px-2">
          <img 
-            src={botInfo?.avatarUrl || "https://ui-avatars.com/api/?name=B&background=7289DA&color=fff"} 
+            src={botInfo?.avatarUrl || "https://ui-avatars.com/api/?name=D&background=7289DA&color=fff"} 
             alt="Bot Avatar" 
             className="w-10 h-10 rounded-full" 
          />
         <div>
-            <h1 className="text-xl font-bold">{botInfo?.name || 'AuraBot'}</h1>
+            <h1 className="text-xl font-bold">{botInfo?.name || 'Discora'}</h1>
             <div className="flex items-center space-x-1.5">
                 <span className={`w-2.5 h-2.5 rounded-full transition-colors ${isBotOnline ? 'bg-green-500' : 'bg-red-500'}`}></span>
                 <span className="text-xs text-text-secondary">{isBotOnline ? 'Online' : 'Offline'}</span>

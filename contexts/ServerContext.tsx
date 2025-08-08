@@ -24,7 +24,7 @@ interface ServerProviderProps {
     children: ReactNode;
 }
 
-const LOCAL_STORAGE_KEY = 'aurabot_selected_guild_id';
+const LOCAL_STORAGE_KEY = 'discora_selected_guild_id';
 
 export const ServerProvider: React.FC<ServerProviderProps> = ({ children }) => {
     const [servers, setServers] = useState<Server[]>([]);
