@@ -1,6 +1,5 @@
-
 <div align="center">
-  <img src="https://raw.githubusercontent.com/nakumi/Discora-next/master/public/logo.png" alt="Discora Logo" width="150">
+  <img src="https://raw.githubusercontent.com/bayusegara27/discora/refs/heads/master/img/discord-logo.png" alt="Discora Logo" width="200">
   <h1 align="center">Discora Dashboard</h1>
   <p align="center">
     Your All-in-One Mission Control for the Discora Discord Bot.
@@ -15,8 +14,7 @@ Stop guessing commands and editing configuration files. Start managing your serv
 
 <br/>
 
-*Placeholder for a screenshot of the dashboard.*
-<!-- ![Discora Dashboard Screenshot](link-to-your-screenshot.png) -->
+![Discora Dashboard Screenshot](https://raw.githubusercontent.com/bayusegara27/discora/refs/heads/master/img/discord-preview.png)
 
 ---
 
@@ -25,13 +23,13 @@ Stop guessing commands and editing configuration files. Start managing your serv
 - **Your Mission Control**: Get a bird's-eye view of your server with real-time stats on member counts, online status, message activity, and role distribution.
 - **Effortless Configuration**: Visually manage everything from welcome messages and auto-roles to a server-wide leveling system with role rewards.
 - **Boost Your Community**:
-    - **Custom Commands**: Easily create, edit, and delete text or embed commands without touching a line of code.
-    - **YouTube Notifications**: Keep your community engaged by automatically announcing new video uploads from your favorite channels.
-    - **Giveaways & Events**: Launch and manage giveaways directly from the dashboard.
+  - **Custom Commands**: Easily create, edit, and delete text or embed commands without touching a line of code.
+  - **YouTube Notifications**: Keep your community engaged by automatically announcing new video uploads from your favorite channels.
+  - **Giveaways & Events**: Launch and manage giveaways directly from the dashboard.
 - **Keep Your Server Safe & Healthy**:
-    - **Advanced Auto-Mod**: Configure a multi-layered defense system with a banned words filter, link/invite blocking, and mention spam prevention.
-    - **AI-Powered Moderation**: Leverage the Google Gemini API to automatically detect and remove toxic or harmful messages.
-    - **Comprehensive Logs**: Review detailed audit logs for server events and command usage logs to understand community activity.
+  - **Advanced Auto-Mod**: Configure a multi-layered defense system with a banned words filter, link/invite blocking, and mention spam prevention.
+  - **AI-Powered Moderation**: Leverage the Google Gemini API to automatically detect and remove toxic or harmful messages.
+  - **Comprehensive Logs**: Review detailed audit logs for server events and command usage logs to understand community activity.
 - **Secure & Self-Hosted**: With a full authentication system running on your private Appwrite instance, your data remains yours.
 
 ## Technology Stack
