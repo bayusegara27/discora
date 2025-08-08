@@ -271,8 +271,13 @@ async function setup() {
       { key: "customMessage", type: "string", size: 1024, required: false },
       { key: "liveMessage", type: "string", size: 1024, required: false },
       { key: "lastVideoTimestamp", type: "string", size: 64, required: false },
+      // Deprecated, but kept for non-breaking setup script. New logic won't use them.
       { key: "latestVideoId", type: "string", size: 64, required: false },
       { key: "latestVideoTitle", type: "string", size: 256, required: false },
+      // New attributes for robust tracking
+      { key: "announcedVideoIds", type: "string", size: 2000, required: false, default: "[]" },
+      { key: "lastAnnouncedVideoId", type: "string", size: 64, required: false },
+      { key: "lastAnnouncedVideoTitle", type: "string", size: 256, required: false },
     ];
     for (const attr of youtubeAttributes)
       await createAttribute( APPWRITE_DATABASE_ID, YOUTUBE_SUBSCRIPTIONS_COLLECTION_ID, attr );
@@ -364,7 +369,7 @@ async function setup() {
       { key: "reason", type: "string", size: 512, required: false },
       { key: "initiatorId", type: "string", size: 64, required: true },
     ])
-      await createAttribute( APPWRITE_DATABASE_ID, MODERATION_QUEUE_COLLECTION_ID, attr );
+      await createAttribute( APPWRITE_DATABASE_ID, MODERATION_QUEUE_COLlection_ID, attr );
 
     await createCollection( APPWRITE_DATABASE_ID, MEMBERS_COLLECTION_ID, "Members", [Permission.read(Role.users())] );
     for (const attr of [

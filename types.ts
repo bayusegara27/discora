@@ -73,8 +73,9 @@ export interface YoutubeSubscription {
   customMessage?: string;
   liveMessage?: string;
   lastVideoTimestamp?: string;
-  latestVideoId?: string;
-  latestVideoTitle?: string;
+  announcedVideoIds?: string; // JSON string array of video IDs
+  lastAnnouncedVideoId?: string;
+  lastAnnouncedVideoTitle?: string;
 }
 
 export enum LogType {

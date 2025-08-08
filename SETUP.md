@@ -1,4 +1,3 @@
-
 # Discora Setup Guide
 
 Welcome! This guide will walk you through setting up the entire Discora ecosystem: the Appwrite backend, the Discord bot, and the web dashboard. Follow these steps carefully, and you'll be managing your server like a pro.
@@ -22,7 +21,15 @@ This is the foundation of your dashboard. We'll create the project and run a scr
     - In your Appwrite console, click `Create project`.
     - Name it **Discora** and take note of the **Project ID** and **API Endpoint URL**.
 
-2.  **Create a Server-Side API Key**
+2.  **Add a Web Platform**
+    > **CRITICAL STEP:** This step is required to prevent browser errors (CORS).
+    - In your Appwrite project, navigate to the **Platforms** section from the sidebar.
+    - Click `Add Platform` and choose `New Web App`.
+    - Give it a name, e.g., "Discora Dashboard".
+    - For the **Hostname**, enter `localhost`. Appwrite treats this as a special value, and you don't need to specify the port.
+    - Click `Create`. This step tells Appwrite to accept requests from your local development server.
+
+3.  **Create a Server-Side API Key**
     - Go to the **API Keys** section.
     - Select `Create API key`, name it `Discora Bot Key`, and grant it these scopes:
         - `databases.read`
@@ -31,7 +38,7 @@ This is the foundation of your dashboard. We'll create the project and run a scr
         - `documents.write`
     - Create the key and **securely copy the API Key Secret**. This is a server key and should be kept private.
 
-3.  **Configure Local Environment for Setup**
+4.  **Configure Local Environment for Setup**
     - In the project's root directory, create a file named `.env`.
     - Add the following, filling in the details from the steps above:
 
@@ -43,13 +50,13 @@ This is the foundation of your dashboard. We'll create the project and run a scr
     APPWRITE_API_KEY="YOUR_APPWRITE_SERVER_API_KEY_SECRET"
     ```
 
-4.  **Install Root Dependencies**
+5.  **Install Root Dependencies**
     - In your terminal, at the project root, run:
       ```bash
       npm install
       ```
 
-5.  **Run the Automated Database Setup**
+6.  **Run the Automated Database Setup**
     > **Note:** This script is safe to run multiple times. If you update the project and encounter database errors, running this script again is the first thing you should do. It adds new collections and attributes without deleting your data.
     - In the project root, execute the script:
       ```bash

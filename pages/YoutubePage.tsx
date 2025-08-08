@@ -168,17 +168,17 @@ const YoutubePage: React.FC = () => {
                                         <div className="font-mono text-xs text-text-secondary">{sub.discordChannelId}</div>
                                     </td>
                                     <td className="p-4 align-top">
-                                        {sub.latestVideoId ? (
+                                        {sub.lastAnnouncedVideoId ? (
                                             <>
-                                                <a href={`https://www.youtube.com/watch?v=${sub.latestVideoId}`} target="_blank" rel="noopener noreferrer" className="font-medium text-accent hover:underline break-words">
-                                                    {sub.latestVideoTitle || sub.latestVideoId}
+                                                <a href={`https://www.youtube.com/watch?v=${sub.lastAnnouncedVideoId}`} target="_blank" rel="noopener noreferrer" className="font-medium text-accent hover:underline break-words">
+                                                    {sub.lastAnnouncedVideoTitle || sub.lastAnnouncedVideoId}
                                                 </a>
                                                 <div className="text-xs text-text-secondary mt-1 whitespace-nowrap">
                                                     {sub.lastVideoTimestamp ? `Found on ${new Date(sub.lastVideoTimestamp).toLocaleDateString()}` : ''}
                                                 </div>
                                             </>
                                         ) : (
-                                            <span className="text-text-secondary">N/A</span>
+                                            <span className="text-text-secondary">Monitoring...</span>
                                         )}
                                     </td>
                                     <td className="p-4 align-top text-right space-x-2 whitespace-nowrap">
