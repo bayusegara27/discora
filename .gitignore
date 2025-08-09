@@ -39,3 +39,7 @@ Thumbs.db
 
 gitignore.txt
 metadata.json
+deployment.tar.gz
+
+# Dependency directories
+node_modules/
