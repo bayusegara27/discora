@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useCallback } from 'react';
 import { appwriteService } from '../services/appwrite';
 import { YoutubeSubscription, ServerMetadata } from '../types';
@@ -27,7 +28,7 @@ const YoutubePage: React.FC = () => {
             setSubscriptions(data);
             setMetadata(meta);
         } catch (error) {
-            console.error('Failed to fetch YouTube page data', error);
+            console.error(`[YoutubePage] Failed to fetch data for guild ${guildId}:`, error);
             addToast('Could not fetch page data.', 'error');
         } finally {
             setLoading(false);
@@ -105,6 +106,7 @@ const YoutubePage: React.FC = () => {
             fetchData(selectedServer.guildId);
             closeModal();
         } catch (error) {
+            console.error(`[YoutubePage] Failed to save subscription for guild ${selectedServer.guildId}:`, error);
             addToast('Failed to save subscription.', 'error');
         } finally {
             setSaving(false);
@@ -119,6 +121,7 @@ const YoutubePage: React.FC = () => {
                 addToast('Subscription deleted.', 'success');
                 fetchData(selectedServer.guildId);
             } catch (error) {
+                console.error(`[YoutubePage] Failed to delete subscription ${subId}:`, error);
                 addToast('Failed to delete subscription.', 'error');
             }
         }

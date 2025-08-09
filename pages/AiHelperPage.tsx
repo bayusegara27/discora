@@ -1,4 +1,5 @@
 
+
 import React, { useState } from 'react';
 import { geminiService } from '../services/gemini';
 import { useToast } from '../contexts/ToastContext';
@@ -45,6 +46,7 @@ const AiHelperPage: React.FC = () => {
       const result = await geminiService.generateContent(fullPrompt, systemInstruction);
       setGeneratedContent(result);
     } catch (err) {
+      console.error("[AiHelperPage] Failed to generate content:", err);
       const message = err instanceof Error ? err.message : 'An unknown error occurred.';
       setError(`Failed to generate content: ${message}`);
       addToast(message, 'error');

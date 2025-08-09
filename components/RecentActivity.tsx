@@ -39,18 +39,10 @@ const RecentActivity: React.FC<RecentActivityProps> = ({ items }) => {
       {/* Date and Time Header */}
       <div>
         <p className="text-5xl font-bold text-accent -mb-1">
-          {currentTime.toLocaleTimeString([], {
-            hour: "2-digit",
-            minute: "2-digit",
-            hour12: false,
-          })}
+          {currentTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })}
         </p>
         <p className="font-semibold text-text-secondary tracking-wide">
-          {currentTime.toLocaleDateString(undefined, {
-            weekday: "long",
-            day: "numeric",
-            month: "long",
-          })}
+          {currentTime.toLocaleDateString(undefined, { weekday: 'long', day: 'numeric', month: 'long' })}
         </p>
       </div>
 
@@ -66,17 +58,12 @@ const RecentActivity: React.FC<RecentActivityProps> = ({ items }) => {
             <div className="absolute left-3.5 top-0 h-full w-0.5 bg-white/10"></div>
             <ul className="space-y-6">
               {items.map((item) => (
-                <li
-                  key={item.id}
-                  className="flex items-start space-x-4 relative"
-                >
+                <li key={item.id} className="flex items-start space-x-4 relative">
                   <div className="flex-shrink-0 bg-secondary/80 text-accent rounded-full p-2 z-10">
                     {item.icon}
                   </div>
                   <div className="flex-1">
-                    <p className="text-sm text-text-primary leading-tight">
-                      {item.text}
-                    </p>
+                    <p className="text-sm text-text-primary leading-tight">{item.text}</p>
                     <p className="text-xs text-text-secondary pt-1">
                       {timeSince(new Date(item.timestamp))}
                     </p>

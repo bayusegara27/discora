@@ -1,3 +1,4 @@
+
 import {
     databases,
     account,
@@ -103,27 +104,27 @@ export const appwriteService = {
         try {
             await account.createEmailPasswordSession(email, password);
             return await account.get();
-        } catch (e) { console.error("Appwrite service :: login :: error", e); throw e; }
+        } catch (e) { console.error("[Appwrite] login :: error", e); throw e; }
     },
 
     async register(name: string, email: string, password: string): Promise<Models.User<Models.Preferences>> {
         try {
             await account.create(ID.unique(), email, password, name);
             return await this.login(email, password);
-        } catch (e) { console.error("Appwrite service :: register :: error", e); throw e; }
+        } catch (e) { console.error("[Appwrite] register :: error", e); throw e; }
     },
 
     async logout(): Promise<void> {
         try {
             await account.deleteSession('current');
-        } catch (e) { console.error("Appwrite service :: logout :: error", e); throw e; }
+        } catch (e) { console.error("[Appwrite] logout :: error", e); throw e; }
     },
 
     async getCurrentAccount(): Promise<Models.User<Models.Preferences> | null> {
         try {
             return await account.get();
         } catch (e: any) {
-            if (e.code !== 401) { console.error("Appwrite service :: getCurrentAccount :: error", e); }
+            if (e.code !== 401) { console.error("[Appwrite] getCurrentAccount :: error", e); }
             return null;
         }
     },
@@ -133,7 +134,7 @@ export const appwriteService = {
       try {
         const response = await databases.listDocuments(APPWRITE_DATABASE_ID, SERVERS_COLLECTION_ID, [Query.limit(100)]);
         return response.documents.map(doc => mapDoc<Server>(doc));
-      } catch (error) { console.error("Appwrite service :: getServers :: error", error); return []; }
+      } catch (error) { console.error("[Appwrite] getServers :: error", error); return []; }
     },
 
     // --- Server Metadata (Channels & Roles) ---
@@ -152,7 +153,7 @@ export const appwriteService = {
                 return metadataDoc;
             }
             return null;
-        } catch(e) { console.error("Appwrite service :: getServerMetadata :: error", e); return null; }
+        } catch(e) { console.error(`[Appwrite] getServerMetadata for guild ${guildId} :: error`, e); return null; }
     },
 
     // --- Server Settings ---
@@ -182,7 +183,7 @@ export const appwriteService = {
                 const newDoc = await databases.createDocument(APPWRITE_DATABASE_ID, SETTINGS_COLLECTION_ID, ID.unique(), newDocData);
                 return { id: newDoc.$id, guildId, ...defaultFullSettings };
             }
-        } catch (e) { console.error("Appwrite service :: getSettings :: error", e); throw e; }
+        } catch (e) { console.error(`[Appwrite] getSettings for guild ${guildId} :: error`, e); throw e; }
     },
 
     async updateSettings(settings: ServerSettings): Promise<ServerSettings> {
@@ -199,7 +200,7 @@ export const appwriteService = {
             await databases.updateDocument(APPWRITE_DATABASE_ID, SETTINGS_COLLECTION_ID, id!, dataToSave);
             // Refetch to get freshly parsed data and confirm save
             return this.getSettings(guildId);
-        } catch (e) { console.error("Appwrite service :: updateSettings :: error", e); throw e; }
+        } catch (e) { console.error(`[Appwrite] updateSettings for settings ${settings.id} :: error`, e); throw e; }
     },
 
     // --- YouTube Subscriptions ---
@@ -207,14 +208,14 @@ export const appwriteService = {
         try {
             const response = await databases.listDocuments(APPWRITE_DATABASE_ID, YOUTUBE_SUBSCRIPTIONS_COLLECTION_ID, [Query.equal('guildId', guildId), Query.orderAsc('youtubeChannelName')]);
             return response.documents.map(doc => mapDoc<YoutubeSubscription>(doc));
-        } catch (e) { console.error("Appwrite service :: getYoutubeSubscriptions :: error", e); return []; }
+        } catch (e) { console.error(`[Appwrite] getYoutubeSubscriptions for guild ${guildId} :: error`, e); return []; }
     },
 
     async createYoutubeSubscription(subscription: Omit<YoutubeSubscription, 'id'>): Promise<YoutubeSubscription> {
         try {
             const newDoc = await databases.createDocument(APPWRITE_DATABASE_ID, YOUTUBE_SUBSCRIPTIONS_COLLECTION_ID, ID.unique(), subscription);
             return mapDoc<YoutubeSubscription>(newDoc);
-        } catch (e) { console.error("Appwrite service :: createYoutubeSubscription :: error", e); throw e; }
+        } catch (e) { console.error("[Appwrite] createYoutubeSubscription :: error", e); throw e; }
     },
 
     async updateYoutubeSubscription(subscription: YoutubeSubscription): Promise<YoutubeSubscription> {
@@ -222,13 +223,13 @@ export const appwriteService = {
             const { id, ...data } = subscription;
             const updatedDoc = await databases.updateDocument(APPWRITE_DATABASE_ID, YOUTUBE_SUBSCRIPTIONS_COLLECTION_ID, id!, data);
             return mapDoc<YoutubeSubscription>(updatedDoc);
-        } catch (e) { console.error("Appwrite service :: updateYoutubeSubscription :: error", e); throw e; }
+        } catch (e) { console.error(`[Appwrite] updateYoutubeSubscription for sub ${subscription.id} :: error`, e); throw e; }
     },
     
     async deleteYoutubeSubscription(subscriptionId: string): Promise<void> {
         try {
             await databases.deleteDocument(APPWRITE_DATABASE_ID, YOUTUBE_SUBSCRIPTIONS_COLLECTION_ID, subscriptionId);
-        } catch (e) { console.error("Appwrite service :: deleteYoutubeSubscription :: error", e); throw e; }
+        } catch (e) { console.error(`[Appwrite] deleteYoutubeSubscription for sub ${subscriptionId} :: error`, e); throw e; }
     },
 
     // --- Logs (Read-only from frontend) ---
@@ -236,14 +237,14 @@ export const appwriteService = {
         try {
             const response = await databases.listDocuments(APPWRITE_DATABASE_ID, AUDIT_LOGS_COLLECTION_ID, [Query.equal('guildId', guildId), Query.orderDesc('$createdAt'), Query.limit(100)]);
             return response.documents.map(doc => mapDoc<LogEntry>(doc));
-        } catch (e) { console.error("Appwrite service :: getAuditLogs :: error", e); return []; }
+        } catch (e) { console.error(`[Appwrite] getAuditLogs for guild ${guildId} :: error`, e); return []; }
     },
 
     async getCommandLogs(guildId: string): Promise<CommandLogEntry[]> {
         try {
             const response = await databases.listDocuments(APPWRITE_DATABASE_ID, COMMAND_LOGS_COLLECTION_ID, [Query.equal('guildId', guildId), Query.orderDesc('$createdAt'), Query.limit(100)]);
             return response.documents.map(doc => mapDoc<CommandLogEntry>(doc));
-        } catch (e) { console.error("Appwrite service :: getCommandLogs :: error", e); return []; }
+        } catch (e) { console.error(`[Appwrite] getCommandLogs for guild ${guildId} :: error`, e); return []; }
     },
 
     // --- Server Statistics ---
@@ -270,7 +271,7 @@ export const appwriteService = {
             return mapDoc<ServerStats>(newDoc);
 
         } catch (e) {
-            console.error("Appwrite service :: getServerStats :: error", e);
+            console.error(`[Appwrite] getServerStats for guild ${guildId} :: error`, e);
             return { guildId, doc_id: 'main_stats', ...defaultStats };
         }
     },
@@ -280,14 +281,14 @@ export const appwriteService = {
         try {
             const response = await databases.listDocuments(APPWRITE_DATABASE_ID, CUSTOM_COMMANDS_COLLECTION_ID, [Query.equal('guildId', guildId), Query.orderAsc('command')]);
             return response.documents.map(doc => mapDoc<CustomCommand>(doc));
-        } catch (e) { console.error("Appwrite service :: getCustomCommands :: error", e); return []; }
+        } catch (e) { console.error(`[Appwrite] getCustomCommands for guild ${guildId} :: error`, e); return []; }
     },
 
     async createCustomCommand(command: Omit<CustomCommand, 'id'>): Promise<CustomCommand> {
         try {
             const newDoc = await databases.createDocument(APPWRITE_DATABASE_ID, CUSTOM_COMMANDS_COLLECTION_ID, ID.unique(), command);
             return mapDoc<CustomCommand>(newDoc);
-        } catch (e) { console.error("Appwrite service :: createCustomCommand :: error", e); throw e; }
+        } catch (e) { console.error("[Appwrite] createCustomCommand :: error", e); throw e; }
     },
 
     async updateCustomCommand(command: CustomCommand): Promise<CustomCommand> {
@@ -295,13 +296,13 @@ export const appwriteService = {
             const { id, ...data } = command;
             const updatedDoc = await databases.updateDocument(APPWRITE_DATABASE_ID, CUSTOM_COMMANDS_COLLECTION_ID, id!, data);
             return mapDoc<CustomCommand>(updatedDoc);
-        } catch (e) { console.error("Appwrite service :: updateCustomCommand :: error", e); throw e; }
+        } catch (e) { console.error(`[Appwrite] updateCustomCommand for command ${command.id} :: error`, e); throw e; }
     },
 
     async deleteCustomCommand(commandId: string): Promise<void> {
         try {
             await databases.deleteDocument(APPWRITE_DATABASE_ID, CUSTOM_COMMANDS_COLLECTION_ID, commandId);
-        } catch (e) { console.error("Appwrite service :: deleteCustomCommand :: error", e); throw e; }
+        } catch (e) { console.error(`[Appwrite] deleteCustomCommand for command ${commandId} :: error`, e); throw e; }
     },
     
     // --- Reaction Roles ---
@@ -313,7 +314,7 @@ export const appwriteService = {
                 role.roles = parseJsonField(role.roles, []);
             });
             return roles;
-        } catch (e) { console.error("Appwrite service :: getReactionRoles :: error", e); return []; }
+        } catch (e) { console.error(`[Appwrite] getReactionRoles for guild ${guildId} :: error`, e); return []; }
     },
     
     async createReactionRole(roleData: Omit<ReactionRole, 'id' | 'messageId'>): Promise<ReactionRole> {
@@ -326,13 +327,13 @@ export const appwriteService = {
                 reactionRoleId: newDoc.$id,
             });
             return mapDoc<ReactionRole>(newDoc);
-        } catch (e) { console.error("Appwrite service :: createReactionRole :: error", e); throw e; }
+        } catch (e) { console.error("[Appwrite] createReactionRole :: error", e); throw e; }
     },
 
     async deleteReactionRole(id: string): Promise<void> {
         try {
             await databases.deleteDocument(APPWRITE_DATABASE_ID, REACTION_ROLES_COLLECTION_ID, id);
-        } catch (e) { console.error("Appwrite service :: deleteReactionRole :: error", e); throw e; }
+        } catch (e) { console.error(`[Appwrite] deleteReactionRole for ID ${id} :: error`, e); throw e; }
     },
 
     // --- Scheduled Messages ---
@@ -340,14 +341,14 @@ export const appwriteService = {
         try {
             const response = await databases.listDocuments(APPWRITE_DATABASE_ID, SCHEDULED_MESSAGES_COLLECTION_ID, [Query.equal('guildId', guildId), Query.orderDesc('nextRun')]);
             return response.documents.map(doc => mapDoc<ScheduledMessage>(doc));
-        } catch (e) { console.error("Appwrite service :: getScheduledMessages :: error", e); return []; }
+        } catch (e) { console.error(`[Appwrite] getScheduledMessages for guild ${guildId} :: error`, e); return []; }
     },
 
     async createScheduledMessage(messageData: Omit<ScheduledMessage, 'id'>): Promise<ScheduledMessage> {
         try {
             const newDoc = await databases.createDocument(APPWRITE_DATABASE_ID, SCHEDULED_MESSAGES_COLLECTION_ID, ID.unique(), messageData);
             return mapDoc<ScheduledMessage>(newDoc);
-        } catch (e) { console.error("Appwrite service :: createScheduledMessage :: error", e); throw e; }
+        } catch (e) { console.error("[Appwrite] createScheduledMessage :: error", e); throw e; }
     },
 
     async updateScheduledMessage(messageData: ScheduledMessage): Promise<ScheduledMessage> {
@@ -355,13 +356,13 @@ export const appwriteService = {
             const { id, ...data } = messageData;
             const updatedDoc = await databases.updateDocument(APPWRITE_DATABASE_ID, SCHEDULED_MESSAGES_COLLECTION_ID, id!, data);
             return mapDoc<ScheduledMessage>(updatedDoc);
-        } catch (e) { console.error("Appwrite service :: updateScheduledMessage :: error", e); throw e; }
+        } catch (e) { console.error(`[Appwrite] updateScheduledMessage for ID ${messageData.id} :: error`, e); throw e; }
     },
 
     async deleteScheduledMessage(id: string): Promise<void> {
         try {
             await databases.deleteDocument(APPWRITE_DATABASE_ID, SCHEDULED_MESSAGES_COLLECTION_ID, id);
-        } catch (e) { console.error("Appwrite service :: deleteScheduledMessage :: error", e); throw e; }
+        } catch (e) { console.error(`[Appwrite] deleteScheduledMessage for ID ${id} :: error`, e); throw e; }
     },
 
     // --- Giveaways ---
@@ -369,7 +370,7 @@ export const appwriteService = {
         try {
             const response = await databases.listDocuments(APPWRITE_DATABASE_ID, GIVEAWAYS_COLLECTION_ID, [Query.equal('guildId', guildId), Query.orderDesc('endsAt')]);
             return response.documents.map(doc => mapDoc<Giveaway>(doc));
-        } catch (e) { console.error("Appwrite service :: getGiveaways :: error", e); return []; }
+        } catch (e) { console.error(`[Appwrite] getGiveaways for guild ${guildId} :: error`, e); return []; }
     },
     
     async createGiveaway(giveawayData: Omit<Giveaway, 'id' | 'messageId' | 'status'>): Promise<Giveaway> {
@@ -381,7 +382,7 @@ export const appwriteService = {
                 giveawayId: newDoc.$id,
             });
             return mapDoc<Giveaway>(newDoc);
-        } catch (e) { console.error("Appwrite service :: createGiveaway :: error", e); throw e; }
+        } catch (e) { console.error("[Appwrite] createGiveaway :: error", e); throw e; }
     },
 
     async rerollGiveaway(giveawayId: string): Promise<void> {
@@ -390,13 +391,13 @@ export const appwriteService = {
             await databases.updateDocument(APPWRITE_DATABASE_ID, GIVEAWAYS_COLLECTION_ID, giveawayId, {
                 status: 'running' // Temporarily set to running to trigger bot logic
             });
-        } catch (e) { console.error("Appwrite service :: rerollGiveaway :: error", e); throw e; }
+        } catch (e) { console.error(`[Appwrite] rerollGiveaway for ID ${giveawayId} :: error`, e); throw e; }
     },
 
     async deleteGiveaway(id: string): Promise<void> {
         try {
             await databases.deleteDocument(APPWRITE_DATABASE_ID, GIVEAWAYS_COLLECTION_ID, id);
-        } catch (e) { console.error("Appwrite service :: deleteGiveaway :: error", e); throw e; }
+        } catch (e) { console.error(`[Appwrite] deleteGiveaway for ID ${id} :: error`, e); throw e; }
     },
     
     // --- Bot Status ---
@@ -404,14 +405,14 @@ export const appwriteService = {
         try {
             const response = await databases.listDocuments(APPWRITE_DATABASE_ID, BOT_INFO_COLLECTION_ID, [Query.limit(1)]);
             return response.documents.length > 0 ? mapDoc<BotInfo>(response.documents[0]) : null;
-        } catch (e) { console.error("Appwrite service :: getBotInfo :: error", e); return null; }
+        } catch (e) { console.error("[Appwrite] getBotInfo :: error", e); return null; }
     },
 
     async getSystemStatus(): Promise<SystemStatus | null> {
         try {
             const response = await databases.listDocuments(APPWRITE_DATABASE_ID, SYSTEM_STATUS_COLLECTION_ID, [Query.limit(1)]);
             return response.documents.length > 0 ? mapDoc<SystemStatus>(response.documents[0]) : null;
-        } catch (e) { console.error("Appwrite service :: getSystemStatus :: error", e); return null; }
+        } catch (e) { console.error("[Appwrite] getSystemStatus :: error", e); return null; }
     },
 
     // --- Leaderboard ---
@@ -424,7 +425,7 @@ export const appwriteService = {
                 Query.limit(100)
             ]);
             return response.documents.map(doc => mapDoc<UserLevel>(doc));
-        } catch (e) { console.error("Appwrite service :: getLeaderboard :: error", e); return []; }
+        } catch (e) { console.error(`[Appwrite] getLeaderboard for guild ${guildId} :: error`, e); return []; }
     },
 
     // --- Members ---
@@ -439,13 +440,13 @@ export const appwriteService = {
                 total: response.total,
                 members: response.documents.map(doc => mapDoc<GuildMember>(doc))
             };
-        } catch (e) { console.error("Appwrite service :: getMembers :: error", e); return { total: 0, members: [] }; }
+        } catch (e) { console.error(`[Appwrite] getMembers for guild ${guildId} :: error`, e); return { total: 0, members: [] }; }
     },
 
     // --- Moderation Actions ---
     async createModerationAction(action: ModerationAction): Promise<void> {
         try {
             await databases.createDocument(APPWRITE_DATABASE_ID, MODERATION_QUEUE_COLLECTION_ID, ID.unique(), action);
-        } catch (e) { console.error("Appwrite service :: createModerationAction :: error", e); throw e; }
+        } catch (e) { console.error("[Appwrite] createModerationAction :: error", e); throw e; }
     },
 };

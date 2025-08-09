@@ -67,17 +67,7 @@ export const ICONS = {
       <path
         strokeLinecap="round"
         strokeLinejoin="round"
-        d="M12 21.5l-6.5-3.5V6.5L12 3l6.5 3.5v11.5L12 21.5z"
-      />
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        d="M12 15a3 3 0 100-6 3 3 0 000 6z"
-      />
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        d="M12 22v-2m-7.32-1.12l1.73-1M2.68 13.12l1.73 1M2.68 8.88l1.73-1M6.68 4.12l1.73 1m10.96 0l-1.73 1m3.46 4.76l-1.73 1m-1.73 5.88l1.73 1"
+        d="M12 9v3.75m0-10.036A11.959 11.959 0 0 1 3.598 6 11.99 11.99 0 0 0 3 9.75c0 5.592 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.57-.598-3.75h-.152c-3.196 0-6.1-1.25-8.25-3.286Zm0 13.036h.008v.008H12v-.008Z"
       />
     </svg>
   ),
@@ -202,16 +192,17 @@ export const ICONS = {
     <svg
       xmlns="http://www.w3.org/2000/svg"
       className="h-6 w-6"
-      fill="none"
       viewBox="0 0 24 24"
+      fill="none"
       stroke="currentColor"
       strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
     >
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M15 21a6 6 0 00-9-5.197m0 0A5.995 5.995 0 0012 12a5.995 5.995 0 00-3-5.197M15 21a3 3 0 00-6 0v1h6v-1z"
-      />
+      <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+      <circle cx="9" cy="7" r="4"></circle>
+      <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+      <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
     </svg>
   ),
   youtube: (

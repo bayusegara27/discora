@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { appwriteService } from '../services/appwrite';
 import { LogEntry, LogType } from '../types';
@@ -39,6 +40,7 @@ const AuditLogPage: React.FC = () => {
         setLoading(true);
         appwriteService.getAuditLogs(selectedServer.guildId)
             .then(setLogs)
+            .catch(error => console.error(`[AuditLogPage] Failed to fetch audit logs for guild ${selectedServer.guildId}:`, error))
             .finally(() => setLoading(false));
     }, [selectedServer]);
 

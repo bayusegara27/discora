@@ -82,7 +82,6 @@ const DashboardPage: React.FC = () => {
           .map((log: LogEntry) => {
             let logText: React.ReactNode;
             let icon = ICONS.auditLog;
-            let color = "blue";
 
             switch (log.type) {
               case LogType.AI_MODERATION:
@@ -93,7 +92,6 @@ const DashboardPage: React.FC = () => {
                   </>
                 );
                 icon = ICONS.shield;
-                color = "orange";
                 break;
               case LogType.AUTO_MOD_ACTION:
                 logText = (
@@ -103,7 +101,6 @@ const DashboardPage: React.FC = () => {
                   </>
                 );
                 icon = ICONS.autoMod;
-                color = "orange";
                 break;
               case LogType.MessageDeleted:
                 logText = (
@@ -112,7 +109,6 @@ const DashboardPage: React.FC = () => {
                     message deleted event.
                   </>
                 );
-                color = "gray";
                 break;
               case LogType.UserJoined:
                 logText = (
@@ -135,7 +131,6 @@ const DashboardPage: React.FC = () => {
                     />
                   </svg>
                 );
-                color = "green";
                 break;
               case LogType.UserLeft:
                 logText = (
@@ -158,7 +153,6 @@ const DashboardPage: React.FC = () => {
                     />
                   </svg>
                 );
-                color = "red";
                 break;
               default:
                 logText = (
@@ -204,7 +198,10 @@ const DashboardPage: React.FC = () => {
 
         setActivity(combinedActivity);
       } catch (error) {
-        console.error("Failed to fetch dashboard data:", error);
+        console.error(
+          `[DashboardPage] Failed to fetch data for guild ${selectedServer.guildId}:`,
+          error
+        );
       } finally {
         setLoading(false);
       }
@@ -241,14 +238,13 @@ const DashboardPage: React.FC = () => {
     : [];
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
       {/* Main Content */}
-      <div className="lg:col-span-8 space-y-6">
-        {/* Stat Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="lg:col-span-2 space-y-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           <StatCard
             title="Total Members"
-            value={stats.memberCount.toLocaleString()}
+            value={stats.memberCount}
             icon={
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -261,7 +257,7 @@ const DashboardPage: React.FC = () => {
                   strokeLinecap="round"
                   strokeLinejoin="round"
                   strokeWidth={2}
-                  d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
+                  d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.653-.125-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.653.125-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a4 4 0 11-8 0 4 4 0 018 0z"
                 />
               </svg>
             }
@@ -269,7 +265,7 @@ const DashboardPage: React.FC = () => {
           />
           <StatCard
             title="Online Members"
-            value={stats.onlineCount.toLocaleString()}
+            value={stats.onlineCount}
             icon={
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -282,7 +278,7 @@ const DashboardPage: React.FC = () => {
                   strokeLinecap="round"
                   strokeLinejoin="round"
                   strokeWidth={2}
-                  d="M5.636 18.364a9 9 0 010-12.728m12.728 0a9 9 0 010 12.728m-9.9-2.829a5 5 0 010-7.07m7.072 0a5 5 0 010 7.07M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                  d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0z"
                 />
               </svg>
             }
@@ -290,7 +286,7 @@ const DashboardPage: React.FC = () => {
           />
           <StatCard
             title="Messages Today"
-            value={stats.messagesToday.toLocaleString()}
+            value={stats.messagesToday}
             icon={
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -319,11 +315,11 @@ const DashboardPage: React.FC = () => {
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
-                strokeWidth="2"
               >
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
+                  strokeWidth={2}
                   d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
                 />
               </svg>
@@ -331,14 +327,12 @@ const DashboardPage: React.FC = () => {
             colorClass="red"
           />
         </div>
-
         <AnalyticsChart data={chartData} />
-
         <RoleDistributionChart data={roleDistributionData} />
       </div>
 
       {/* Right Sidebar */}
-      <div className="lg:col-span-4">
+      <div className="lg:col-span-1 space-y-8">
         <RecentActivity items={activity} />
       </div>
     </div>

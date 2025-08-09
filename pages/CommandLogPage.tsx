@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { appwriteService } from '../services/appwrite';
 import { CommandLogEntry } from '../types';
@@ -19,6 +20,7 @@ const CommandLogPage: React.FC = () => {
         setLoading(true);
         appwriteService.getCommandLogs(selectedServer.guildId)
             .then(data => setLogs(data.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())))
+            .catch(error => console.error(`[CommandLogPage] Failed to fetch command logs for guild ${selectedServer.guildId}:`, error))
             .finally(() => setLoading(false));
     }, [selectedServer]);
 

@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { appwriteService } from "../services/appwrite";
 import {
@@ -44,6 +45,7 @@ const SettingsPage: React.FC = () => {
         setSettings(settingsData);
         setMetadata(metadataData);
       } catch (error) {
+        console.error(`[SettingsPage] Failed to load data for guild ${selectedServer.guildId}:`, error);
         addToast("Failed to load server data. Please try again.", "error");
       } finally {
         setLoading(false);
@@ -85,7 +87,7 @@ const SettingsPage: React.FC = () => {
         "success"
       );
     } catch (error) {
-      console.error("Failed to save settings:", error);
+      console.error(`[SettingsPage] Failed to save settings for guild ${settings.guildId}:`, error);
       addToast("Failed to save settings. Please try again.", "error");
     } finally {
       setSaving(false);
