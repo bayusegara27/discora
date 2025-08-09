@@ -109,7 +109,7 @@ export interface ServerStats {
   onlineCount: number;
   messagesToday: number;
   commandCount: number;
-  messagesWeekly: { day: string; count: number }[];
+  messagesWeekly: { date: string; count: number }[];
   totalWarnings: number;
   roleDistribution: { name: string, count: number, color: string }[] | string;
 }

@@ -38,11 +38,7 @@ const defaultStats: Omit<ServerStats, 'id' | 'guildId' | 'doc_id'> = {
     commandCount: 0,
     totalWarnings: 0,
     roleDistribution: [],
-    messagesWeekly: [
-        { day: 'Mon', count: 0 }, { day: 'Tue', count: 0 }, { day: 'Wed', count: 0 },
-        { day: 'Thu', count: 0 }, { day: 'Fri', count: 0 }, { day: 'Sat', count: 0 },
-        { day: 'Sun', count: 0 },
-    ],
+    messagesWeekly: [],
 };
 
 const parseJsonField = (field: any, fallback: any) => {
