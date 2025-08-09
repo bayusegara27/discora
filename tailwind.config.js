@@ -21,6 +21,27 @@ export default {
       fontFamily: {
         sans: ['Inter', 'sans-serif'],
       },
+      animation: {
+        'aurora': 'aurora 20s infinite linear',
+        'pulse-online': 'pulse-online 2s infinite',
+      },
+      keyframes: {
+        aurora: {
+          '0%': { 'background-position': '0% 50%' },
+          '50%': { 'background-position': '100% 50%' },
+          '100%': { 'background-position': '0% 50%' },
+        },
+        'pulse-online': {
+          '0%, 100%': {
+            transform: 'scale(1)',
+            boxShadow: '0 0 0 0 rgba(34, 197, 94, 0.7)',
+           },
+          '50%': {
+            transform: 'scale(1.05)',
+            boxShadow: '0 0 0 5px rgba(34, 197, 94, 0)',
+          },
+        },
+      },
     },
   },
   plugins: [],

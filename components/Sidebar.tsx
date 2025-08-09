@@ -54,21 +54,21 @@ const NavItem: React.FC<NavItemProps> = ({ path, label, icon, onClick }) => (
       to={path}
       onClick={onClick}
       className={({ isActive }) =>
-        `flex items-center p-2 rounded-md transition-colors duration-200 ${
+        `flex items-center p-2.5 rounded-lg transition-all duration-200 group ${
           isActive
-            ? 'bg-primary text-white'
-            : 'text-text-secondary hover:bg-surface hover:text-text-primary'
+            ? 'bg-primary/20 text-white shadow-lg shadow-primary/20'
+            : 'text-text-secondary hover:bg-white/5 hover:text-text-primary'
         }`
       }
     >
-      {icon}
-      <span className="ml-3">{label}</span>
+        <span className="group-[.active]:text-accent">{icon}</span>
+        <span className="ml-3 font-medium">{label}</span>
     </NavLink>
   </li>
 );
 
 const NavDivider: React.FC<{label: string}> = ({ label }) => (
-    <li className="px-2 pt-4 pb-2 text-xs font-bold text-text-secondary uppercase tracking-wider">{label}</li>
+    <li className="px-2 pt-4 pb-2 text-xs font-semibold text-text-secondary/80 uppercase tracking-wider">{label}</li>
 );
 
 interface SidebarProps {
@@ -127,24 +127,24 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, setOpen }) => {
   };
 
   return (
-    <div className={`flex flex-col w-64 bg-secondary text-text-primary p-4 space-y-6 transition-transform duration-300 ease-in-out fixed inset-y-0 left-0 z-30 transform ${isOpen ? 'translate-x-0' : '-translate-x-full'} md:relative md:translate-x-0`}>
+    <aside className={`flex flex-col w-64 bg-secondary/40 backdrop-blur-lg border-r border-white/10 text-text-primary p-4 space-y-6 transition-transform duration-300 ease-in-out fixed inset-y-0 left-0 z-30 transform ${isOpen ? 'translate-x-0' : '-translate-x-full'} md:relative md:translate-x-0`}>
       <div className="flex items-center space-x-3 px-2">
          <img 
             src={botInfo?.avatarUrl || "https://ui-avatars.com/api/?name=D&background=7289DA&color=fff"} 
             alt="Bot Avatar" 
-            className="w-10 h-10 rounded-full" 
+            className="w-10 h-10 rounded-full border-2 border-primary/50" 
          />
         <div>
             <h1 className="text-xl font-bold">{botInfo?.name || 'Discora'}</h1>
-            <div className="flex items-center space-x-1.5">
-                <span className={`w-2.5 h-2.5 rounded-full transition-colors ${isBotOnline ? 'bg-green-500' : 'bg-red-500'}`}></span>
-                <span className="text-xs text-text-secondary">{isBotOnline ? 'Online' : 'Offline'}</span>
+            <div className="flex items-center space-x-2">
+                <span className={`w-3 h-3 rounded-full transition-colors ${isBotOnline ? 'bg-green-500 animate-pulse-online' : 'bg-red-500'}`}></span>
+                <span className="text-xs font-semibold text-text-secondary">{isBotOnline ? 'Online' : 'Offline'}</span>
             </div>
         </div>
       </div>
 
-      <nav className="flex-1 overflow-y-auto">
-        <ul className="space-y-1">
+      <nav className="flex-1 overflow-y-auto pr-2 -mr-2">
+        <ul className="space-y-1.5">
           {navItems.map((item, index) => 
             item.type === 'link'
             ? <NavItem key={item.path} path={item.path} label={item.label} icon={item.icon} onClick={handleNavItemClick} />
@@ -154,12 +154,12 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, setOpen }) => {
       </nav>
 
       <div className="mt-auto">
-        <button onClick={handleLogout} className="flex items-center p-2 rounded-md w-full text-text-secondary hover:bg-surface hover:text-text-primary">
+        <button onClick={handleLogout} className="flex items-center p-2.5 rounded-lg w-full text-text-secondary hover:bg-white/5 hover:text-text-primary">
           {ICONS.logout}
-          <span className="ml-3">Logout</span>
+          <span className="ml-3 font-medium">Logout</span>
         </button>
       </div>
-    </div>
+    </aside>
   );
 };
 

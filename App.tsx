@@ -72,13 +72,13 @@ const DashboardLayout: React.FC = () => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
 
   return (
-    <div className="flex h-screen bg-background text-text-primary relative">
+    <div className="flex h-screen bg-background/80 backdrop-blur-3xl text-text-primary relative">
       <Sidebar isOpen={isSidebarOpen} setOpen={setSidebarOpen} />
       {isSidebarOpen && <div className="fixed inset-0 bg-black/60 z-20 md:hidden" onClick={() => setSidebarOpen(false)}></div>}
 
       <div className="flex-1 flex flex-col overflow-hidden">
         <Header onMenuClick={() => setSidebarOpen(true)} />
-        <main className="flex-1 overflow-x-hidden overflow-y-auto bg-background p-4 md:p-8">
+        <main className="flex-1 overflow-x-hidden overflow-y-auto p-4 md:p-8">
           <Routes>
             <Route path="/" element={<Navigate to="/dashboard" replace />} />
             <Route path="/dashboard" element={<DashboardPage />} />

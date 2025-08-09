@@ -26,7 +26,7 @@ const RightSidebar: React.FC = () => {
             return (
                 <td key={day} className="p-1">
                     <div className={`w-8 h-8 flex items-center justify-center rounded-full text-sm transition-colors ${
-                        isToday ? 'bg-primary text-white font-bold' : 'text-text-primary hover:bg-secondary'
+                        isToday ? 'bg-primary text-white font-bold ring-2 ring-primary/50' : 'text-text-primary hover:bg-secondary'
                     }`}>
                         {day}
                     </div>
@@ -54,34 +54,35 @@ const RightSidebar: React.FC = () => {
 
     return (
         <div className="space-y-8">
-            <div className="bg-surface p-6 rounded-lg shadow-lg">
+            <div className="bg-surface/50 backdrop-blur-md border border-white/10 p-6 rounded-2xl shadow-lg">
                 <div className="flex justify-between items-center mb-4">
                     <h3 className="text-lg font-semibold text-text-primary">Notifications</h3>
-                    <button className="text-text-secondary text-sm hover:text-text-primary transition-colors">Settings</button>
                 </div>
-                <div className="text-center text-text-secondary py-4 border-t border-b border-secondary">No new notifications</div>
+                <div className="text-center text-text-secondary py-4 border-t border-b border-white/10">No new notifications</div>
             </div>
 
-            <div className="bg-surface p-6 rounded-lg shadow-lg">
+            <div className="bg-surface/50 backdrop-blur-md border border-white/10 p-6 rounded-2xl shadow-lg">
                 <div className="mb-4">
                     <p className="font-semibold text-text-primary">
                         {currentTime.toLocaleDateString(undefined, { weekday: 'long', day: 'numeric', month: 'long' })}
                     </p>
-                     <p className="text-4xl font-bold text-accent">
+                     <p className="text-5xl font-bold text-accent">
                         {currentTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                     </p>
                 </div>
 
-                <div className="flex justify-between items-baseline mb-4">
-                    <h3 className="text-lg font-semibold text-text-primary">
-                        {calendarDate.toLocaleDateString(undefined, { month: 'long', year: 'numeric' })}
-                    </h3>
-                </div>
-                <table className="w-full text-center">
+                <table className="w-full text-center mt-6">
                     <thead>
                         <tr>
+                            <th colSpan={7} className="text-left pb-2">
+                                <h3 className="text-lg font-semibold text-text-primary">
+                                    {calendarDate.toLocaleDateString(undefined, { month: 'long', year: 'numeric' })}
+                                </h3>
+                            </th>
+                        </tr>
+                        <tr>
                             {daysOfWeek.map(day => (
-                                <th key={day} className="text-xs text-text-secondary pb-2 font-normal">{day}</th>
+                                <th key={day} className="text-xs text-text-secondary pb-2 font-medium">{day}</th>
                             ))}
                         </tr>
                     </thead>
