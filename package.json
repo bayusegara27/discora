@@ -1,4 +1,3 @@
-
 {
   "name": "discora-dashboard",
   "private": true,
@@ -20,6 +19,7 @@
     "recharts": "^2.12.7"
   },
   "devDependencies": {
+    "@types/node": "^20.14.2",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
     "@typescript-eslint/eslint-plugin": "^7.13.0",
