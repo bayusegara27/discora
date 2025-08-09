@@ -1,4 +1,4 @@
-import { Client, Databases, Account } from 'appwrite';
+import { Client, Databases, Account, OAuthProvider } from 'appwrite';
 
 // --- Appwrite Configuration ---
 export const APPWRITE_ENDPOINT = 'https://appwrite.nakumi.my.id/v1';
@@ -35,4 +35,4 @@ client
 
 export const account = new Account(client);
 export const databases = new Databases(client);
-export { ID, Query } from 'appwrite';
+export { ID, Query, OAuthProvider } from 'appwrite';

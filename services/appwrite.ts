@@ -1,4 +1,5 @@
 
+
 import {
     databases,
     account,
@@ -22,7 +23,8 @@ import {
     GIVEAWAY_QUEUE_COLLECTION_ID,
     APPWRITE_DATABASE_ID,
     BOT_INFO_COLLECTION_ID,
-    SYSTEM_STATUS_COLLECTION_ID
+    SYSTEM_STATUS_COLLECTION_ID,
+    OAuthProvider
 } from './appwriteConfig';
 import { Server, ServerSettings, YoutubeSubscription, LogEntry, ServerStats, CustomCommand, CommandLogEntry, BotInfo, SystemStatus, UserLevel, ModerationAction, GuildMember, ServerMetadata, ReactionRole, ScheduledMessage, Giveaway, WelcomeSettings, GoodbyeSettings, AutoRoleSettings, LevelingSettings, AutoModSettings } from '../types';
 import type { Models } from 'appwrite';
@@ -129,6 +131,19 @@ export const appwriteService = {
         }
     },
     
+    async loginWithDiscord(): Promise<void> {
+        try {
+            account.createOAuth2Session(
+                OAuthProvider.Discord,
+                `${window.location.origin}/`,
+                `${window.location.origin}/#/login`
+            );
+        } catch (e) {
+            console.error("[Appwrite] loginWithDiscord :: error", e);
+            throw e;
+        }
+    },
+
     // --- Servers (Guilds) ---
     async getServers(): Promise<Server[]> {
       try {

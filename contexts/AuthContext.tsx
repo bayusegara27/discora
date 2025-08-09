@@ -7,6 +7,7 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<void>;
   register: (name: string, email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
+  loginWithDiscord: () => Promise<void>;
   loading: boolean;
   authError: string | null;
   setAuthError: (error: string | null) => void;
@@ -69,6 +70,18 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         }
     }, []);
 
+    const loginWithDiscord = useCallback(async () => {
+        setAuthError(null);
+        try {
+            await appwriteService.loginWithDiscord();
+            // The page will redirect, so no local state update is needed.
+        } catch (e: any) {
+            console.error(e);
+            setAuthError(e.message || 'Failed to initiate Discord login.');
+            throw e;
+        }
+    }, []);
+
     const logout = useCallback(async () => {
         setAuthError(null);
         try {
@@ -81,7 +94,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         }
     }, []);
 
-    const value = { user, login, register, logout, loading, authError, setAuthError };
+    const value = { user, login, register, logout, loginWithDiscord, loading, authError, setAuthError };
 
     return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
