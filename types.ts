@@ -1,3 +1,4 @@
+
 export interface Server {
   guildId: string;
   name: string;
@@ -107,11 +108,10 @@ export interface ServerStats {
   guildId: string;
   memberCount: number;
   onlineCount: number;
-  messagesToday: number;
   commandCount: number;
   messagesWeekly: { date: string; count: number }[];
   totalWarnings: number;
-  roleDistribution: { name: string, count: number, color: string }[] | string;
+  roleDistribution: { name: string, count: number, color: string }[];
 }
 
 export interface CustomCommand {
@@ -131,7 +131,7 @@ export interface ReactionRole {
   embedTitle: string;
   embedDescription: string;
   embedColor: string;
-  roles: { emoji: string, roleId: string }[] | string;
+  roles: { emoji: string, roleId: string }[];
 }
 
 export interface ScheduledMessage {

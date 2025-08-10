@@ -1,4 +1,5 @@
 
+
 import React, { useState, useEffect } from 'react';
 import StatCard from '../components/StatCard';
 import AnalyticsChart from '../components/AnalyticsChart';
@@ -23,16 +24,21 @@ const processChartData = (data: { date: string; count: number }[]) => {
     const chartData: { day: string; count: number }[] = [];
     const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
     
-    // Use UTC to avoid timezone-related date calculation errors
-    const today = new Date();
-    const todayUTC = new Date(Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate()));
-
+    // Loop for the last 7 days, ending with today (UTC).
     for (let i = 6; i >= 0; i--) {
-        const d = new Date(todayUTC);
-        d.setUTCDate(d.getUTCDate() - i); // Operate on UTC date
+        // Create a date object representing the current moment.
+        const date = new Date();
         
-        const dateString = d.toISOString().split('T')[0];
-        const dayLabel = days[d.getUTCDay()]; // Use getUTCDay() for correct day of the week
+        // Set its calendar date to `i` days ago, in UTC.
+        // This correctly handles timezone and DST shifts.
+        date.setUTCDate(date.getUTCDate() - i);
+        
+        // Get the day of the week (0-6) from this UTC-adjusted date.
+        const dayOfWeek = date.getUTCDay();
+        const dayLabel = days[dayOfWeek];
+        
+        // Format the date as 'YYYY-MM-DD' in UTC to match the stored data.
+        const dateString = date.toISOString().split('T')[0];
         
         const dataPoint = data.find(p => p.date === dateString);
         chartData.push({
@@ -68,7 +74,7 @@ const DashboardPage: React.FC = () => {
         
         setStats(statsData);
 
-        const weeklyChartData = processChartData(Array.isArray(statsData.messagesWeekly) ? statsData.messagesWeekly : []);
+        const weeklyChartData = processChartData(statsData.messagesWeekly);
         setChartData(weeklyChartData);
 
         const mappedAuditLogs: ActivityItem[] = auditLogs.slice(0, 5).map((log: LogEntry) => {
@@ -151,9 +157,10 @@ const DashboardPage: React.FC = () => {
     return <div className="text-center text-text-secondary">Could not load server statistics for {selectedServer.name}.</div>;
   }
   
-  const roleDistributionData = Array.isArray(stats.roleDistribution)
-    ? stats.roleDistribution
-    : [];
+  // Calculate messages today from the single source of truth
+  const todayUTC = new Date().toISOString().split('T')[0];
+  const todayEntry = stats.messagesWeekly.find(d => d.date === todayUTC);
+  const messagesTodayCount = todayEntry ? todayEntry.count : 0;
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -162,11 +169,11 @@ const DashboardPage: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           <StatCard title="Total Members" value={stats.memberCount} icon={<svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.653-.125-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.653.125-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a4 4 0 11-8 0 4 4 0 018 0z" /></svg>} colorClass="blue" />
           <StatCard title="Online Members" value={stats.onlineCount} icon={<svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0z" /></svg>} colorClass="green" />
-          <StatCard title="Messages Today" value={stats.messagesToday} icon={<svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" /></svg>} colorClass="yellow" />
+          <StatCard title="Messages Today" value={messagesTodayCount} icon={<svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" /></svg>} colorClass="yellow" />
           <StatCard title="Total Warnings" value={stats.totalWarnings} icon={<svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>} colorClass="red" />
         </div>
         <AnalyticsChart data={chartData} />
-        <RoleDistributionChart data={roleDistributionData} />
+        <RoleDistributionChart data={stats.roleDistribution} />
       </div>
 
       {/* Right Sidebar */}

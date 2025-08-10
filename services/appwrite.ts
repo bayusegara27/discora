@@ -1,5 +1,7 @@
 
 
+
+
 import {
     databases,
     account,
@@ -37,7 +39,6 @@ function mapDoc<T>(doc: Models.Document): T {
 const defaultStats: Omit<ServerStats, 'id' | 'guildId' | 'doc_id'> = {
     memberCount: 0,
     onlineCount: 0,
-    messagesToday: 0,
     commandCount: 0,
     totalWarnings: 0,
     roleDistribution: [],
@@ -147,7 +148,7 @@ export const appwriteService = {
     // --- Servers (Guilds) ---
     async getServers(): Promise<Server[]> {
       try {
-        const response = await databases.listDocuments(APPWRITE_DATABASE_ID, SERVERS_COLLECTION_ID, [Query.limit(100)]);
+        const response = await databases.listDocuments(APPWRITE_DATABASE_ID, SERVERS_COLLECTION_ID, [Query.limit(5000)]);
         return response.documents.map(doc => mapDoc<Server>(doc));
       } catch (error) { console.error("[Appwrite] getServers :: error", error); return []; }
     },

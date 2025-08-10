@@ -34,15 +34,25 @@ const RecentActivity: React.FC<RecentActivityProps> = ({ items }) => {
     return Math.floor(seconds) + "s ago";
   };
 
+  const jakartaTimezone = 'Asia/Jakarta';
+  const jakartaTime = currentTime.toLocaleTimeString('en-GB', { timeZone: jakartaTimezone, hour: '2-digit', minute: '2-digit' });
+  const jakartaDate = currentTime.toLocaleDateString('en-US', { timeZone: jakartaTimezone, weekday: 'long', day: 'numeric', month: 'long' });
+  const utcTime = currentTime.toLocaleTimeString('en-GB', { timeZone: 'UTC', hour: '2-digit', minute: '2-digit' });
+
+
   return (
     <div className="bg-surface/50 backdrop-blur-md border border-white/10 p-6 rounded-2xl shadow-lg h-full flex flex-col space-y-6">
       {/* Date and Time Header */}
       <div>
         <p className="text-5xl font-bold text-accent -mb-1">
-          {currentTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })}
+          {jakartaTime}
         </p>
         <p className="font-semibold text-text-secondary tracking-wide">
-          {currentTime.toLocaleDateString(undefined, { weekday: 'long', day: 'numeric', month: 'long' })}
+          {jakartaDate}
+          <span className="ml-2 text-xs uppercase bg-secondary/50 px-1.5 py-0.5 rounded">WIB</span>
+        </p>
+        <p className="text-xs text-text-secondary/70 mt-1">
+          (Data &amp; charts are in UTC: {utcTime} UTC)
         </p>
       </div>
 

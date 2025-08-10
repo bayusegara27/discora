@@ -99,19 +99,31 @@ const SettingsPage: React.FC = () => {
       addToast("Please select both a Level and a Role.", "error");
       return;
     }
+    const newLevel = parseInt(newReward.level, 10);
+    if (isNaN(newLevel) || newLevel <= 0) {
+        addToast("Please enter a valid, positive level number.", "error");
+        return;
+    }
+    const levelExists = settings.leveling.roleRewards.some(reward => reward.level === newLevel);
+    if (levelExists) {
+        addToast("A reward for this level already exists. Please remove the old one first.", "error");
+        return;
+    }
+
     const rewards = settings.leveling.roleRewards;
     const updatedRewards = [
       ...rewards,
-      { level: parseInt(newReward.level, 10), roleId: newReward.roleId },
+      { level: newLevel, roleId: newReward.roleId },
     ];
+    updatedRewards.sort((a, b) => a.level - b.level);
     handleNestedChange("leveling", "roleRewards", updatedRewards);
     setNewReward({ level: "", roleId: "" });
   };
 
-  const handleDeleteReward = (index: number) => {
+  const handleDeleteReward = (levelToDelete: number) => {
     if (!settings) return;
     const rewards = settings.leveling.roleRewards;
-    const updatedRewards = rewards.filter((_, i) => i !== index);
+    const updatedRewards = rewards.filter((r) => r.level !== levelToDelete);
     handleNestedChange("leveling", "roleRewards", updatedRewards);
   };
 
@@ -481,13 +493,16 @@ const SettingsPage: React.FC = () => {
                 </p>
                 <div className="space-y-2 mb-4">
                   {settings.leveling.roleRewards.length > 0 ? (
-                    settings.leveling.roleRewards.map((reward, index) => {
+                    settings.leveling.roleRewards
+                      .slice()
+                      .sort((a, b) => a.level - b.level)
+                      .map((reward) => {
                       const role = metadata?.roles.find(
                         (r) => r.id === reward.roleId
                       );
                       return (
                         <div
-                          key={index}
+                          key={reward.level}
                           className="flex items-center justify-between bg-secondary p-2 rounded-md"
                         >
                           <p>
@@ -511,7 +526,7 @@ const SettingsPage: React.FC = () => {
                           </p>
                           <button
                             type="button"
-                            onClick={() => handleDeleteReward(index)}
+                            onClick={() => handleDeleteReward(reward.level)}
                             className="text-red-400 hover:text-red-300"
                           >
                             <svg

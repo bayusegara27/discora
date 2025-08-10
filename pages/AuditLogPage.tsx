@@ -1,4 +1,5 @@
 
+
 import React, { useState, useEffect } from 'react';
 import { appwriteService } from '../services/appwrite';
 import { LogEntry, LogType } from '../types';
@@ -21,7 +22,7 @@ const getLogTypePillClass = (type: LogType): string => {
 }
 
 const LogTypePill: React.FC<{ type: LogType }> = ({ type }) => (
-    <span className={`px-2 py-1 text-xs font-semibold rounded-full ${getLogTypePillClass(type)}`}>
+    <span className={`px-2 py-1 text-xs font-semibold rounded-full capitalize ${getLogTypePillClass(type)}`}>
         {type.replace(/_/g, ' ')}
     </span>
 );
@@ -79,7 +80,7 @@ const AuditLogPage: React.FC = () => {
                                     {new Date(log.timestamp).toLocaleString()}
                                 </td>
                                 <td className="p-4 text-sm text-text-secondary align-top">
-                                    {log.userId !== 'system' && !log.user.includes('AutoMod') && (
+                                    {log.userId !== 'system' && (
                                         <div className="relative group">
                                             <button className="px-2 py-1 rounded-md hover:bg-secondary">
                                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">

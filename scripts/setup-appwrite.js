@@ -1,3 +1,4 @@
+
 import {
   Client,
   Databases,
@@ -47,6 +48,18 @@ const databases = new Databases(client);
 
 const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
+const arraysEqual = (a, b) => {
+    if (a === b) return true;
+    if (a == null || b == null) return false;
+    if (a.length !== b.length) return false;
+    const sortedA = [...a].sort();
+    const sortedB = [...b].sort();
+    for (let i = 0; i < sortedA.length; ++i) {
+        if (sortedA[i] !== sortedB[i]) return false;
+    }
+    return true;
+};
+
 async function createCollection(databaseId, collectionId, name, permissions) {
   try {
     await databases.getCollection(databaseId, collectionId);
@@ -69,68 +82,86 @@ async function createCollection(databaseId, collectionId, name, permissions) {
 }
 
 async function createAttribute(databaseId, collectionId, attribute) {
-  try {
-    await databases.getAttribute(databaseId, collectionId, attribute.key);
-    console.log(`   - Attribute '${attribute.key}' already exists. Skipping.`);
-  } catch (e) {
-    if (e.code === 404) {
-      console.log(`   - Creating attribute '${attribute.key}'...`);
-      try {
-        switch (attribute.type) {
-          case "string":
-            await databases.createStringAttribute(
-              databaseId,
-              collectionId,
-              attribute.key,
-              attribute.size,
-              attribute.required,
-              attribute.default,
-              attribute.array
-            );
-            break;
-          case "boolean":
-            await databases.createBooleanAttribute(
-              databaseId,
-              collectionId,
-              attribute.key,
-              attribute.required,
-              attribute.default,
-              attribute.array
-            );
-            break;
-          case "integer":
-            await databases.createIntegerAttribute(
-              databaseId,
-              collectionId,
-              attribute.key,
-              attribute.required,
-              attribute.min,
-              attribute.max,
-              attribute.default,
-              attribute.array
-            );
-            break;
-          default:
-            throw new Error(`Unknown attribute type: ${attribute.type}`);
+    const { attributes } = await databases.listAttributes(databaseId, collectionId);
+    const existingAttribute = attributes.find(a => a.key === attribute.key);
+
+    if (existingAttribute) {
+        // Attribute exists, check for mismatches. This is a "best effort" check for common changes.
+        // Appwrite doesn't allow most properties to be updated, so we warn the user.
+        let mismatch = false;
+        const warnings = [];
+
+        if (existingAttribute.required !== attribute.required) {
+            mismatch = true;
+            warnings.push(`   - Required: Expected ${attribute.required}, Found ${existingAttribute.required}`);
         }
-        console.log(`   👍 Attribute '${attribute.key}' created.`);
-        await wait(500);
-      } catch (creationError) {
-        console.error(`   - 💥 FAILED to create attribute '${attribute.key}'.`);
-        throw creationError;
-      }
+
+        if (attribute.type === 'string' && existingAttribute.size !== attribute.size) {
+            mismatch = true;
+            warnings.push(`   - Size: Expected ${attribute.size}, Found ${existingAttribute.size}`);
+        }
+
+        if (mismatch) {
+            console.warn(`   - ⚠️  Attribute '${attribute.key}' has a configuration mismatch.`);
+            warnings.forEach(w => console.warn(w));
+            console.warn(`   - 👉 Please manually update this attribute in your Appwrite console if necessary. This may require deleting and recreating the attribute, which can be a destructive action.`);
+        } else {
+            console.log(`   - Attribute '${attribute.key}' already exists and is configured correctly. Skipping.`);
+        }
     } else {
-      throw e;
+        // Attribute does not exist, create it.
+        console.log(`   - Creating attribute '${attribute.key}'...`);
+        try {
+            switch (attribute.type) {
+                case "string":
+                    await databases.createStringAttribute(databaseId, collectionId, attribute.key, attribute.size, attribute.required, attribute.default, attribute.array);
+                    break;
+                case "boolean":
+                    await databases.createBooleanAttribute(databaseId, collectionId, attribute.key, attribute.required, attribute.default, attribute.array);
+                    break;
+                case "integer":
+                    await databases.createIntegerAttribute(databaseId, collectionId, attribute.key, attribute.required, attribute.min, attribute.max, attribute.default, attribute.array);
+                    break;
+                default:
+                    throw new Error(`Unknown attribute type: ${attribute.type}`);
+            }
+            console.log(`   👍 Attribute '${attribute.key}' created.`);
+            // Wait for the attribute to be available for index creation
+            await new Promise(resolve => setTimeout(resolve, 1500));
+        } catch (creationError) {
+            console.error(`   - 💥 FAILED to create attribute '${attribute.key}'.`);
+            throw creationError;
+        }
     }
-  }
 }
+
 
 async function createIndex(databaseId, collectionId, index) {
   try {
-    await databases.getIndex(databaseId, collectionId, index.key);
-    console.log(`   - Index '${index.key}' already exists. Skipping.`);
+    const existingIndex = await databases.getIndex(databaseId, collectionId, index.key);
+    // Index exists, verify its properties
+    const typeMatch = existingIndex.type === index.type;
+    // Note: Appwrite may return orders as null if not specified, so we default to empty array for comparison
+    const orders = index.orders || [];
+    const existingOrders = existingIndex.orders || [];
+    
+    const attributesMatch = arraysEqual(existingIndex.attributes, index.attributes);
+    const ordersMatch = arraysEqual(existingOrders, orders);
+
+    if (typeMatch && attributesMatch && ordersMatch) {
+      console.log(`   - Index '${index.key}' already exists and is correct. Skipping.`);
+    } else {
+      console.warn(`   - ⚠️ Index '${index.key}' has a configuration mismatch. Recreating...`);
+      await databases.deleteIndex(databaseId, collectionId, index.key);
+      console.log(`   - Deleted old index '${index.key}'.`);
+      await wait(1000); // Wait for deletion to process
+      await databases.createIndex(databaseId, collectionId, index.key, index.type, index.attributes, index.orders);
+      console.log(`   👍 Recreated index '${index.key}'.`);
+      await wait(1000);
+    }
   } catch (e) {
     if (e.code === 404) {
+      // Index does not exist, create it
       console.log(`   - Creating index '${index.key}'...`);
       await databases.createIndex(
         databaseId,
@@ -143,6 +174,7 @@ async function createIndex(databaseId, collectionId, index) {
       console.log(`   👍 Index '${index.key}' created.`);
       await wait(1000);
     } else {
+      console.error(`   - 💥 An error occurred with index '${index.key}'.`);
       throw e;
     }
   }
@@ -326,10 +358,9 @@ async function setup() {
       { key: "guildId", type: "string", size: 32, required: true },
       { key: "memberCount", type: "integer", required: false, default: 0 },
       { key: "onlineCount", type: "integer", required: false, default: 0 },
-      { key: "messagesToday", type: "integer", required: false, default: 0 },
       { key: "commandCount", type: "integer", required: false, default: 0 },
       { key: "totalWarnings", type: "integer", required: false, default: 0 },
-      { key: "messagesWeekly", type: "string", size: 1000, required: false, default: "[]" },
+      { key: "messagesWeekly", type: "string", size: 2000, required: false, default: "[]" },
       { key: "roleDistribution", type: "string", size: 10000, required: false, default: "[]" },
     ])
       await createAttribute(APPWRITE_DATABASE_ID, STATS_COLLECTION_ID, attr);

@@ -7,6 +7,9 @@ import { useServer } from '../contexts/ServerContext';
 
 type RolePair = { emoji: string; roleId: string };
 
+// Regex to validate a string as a single Unicode emoji or a custom Discord emoji.
+const EMOJI_REGEX = /^(<a?:\w+:\d+>|(?:\p{Emoji_Presentation}|\p{Emoji_Modifier_Base}|\p{Emoji_Component}|\p{Extended_Pictographic})[\u{1F3FB}-\u{1F3FF}]?(\u200D(?:\p{Emoji_Presentation}|\p{Emoji_Modifier_Base}|\p{Emoji_Component}|\p{Extended_Pictographic})[\u{1F3FB}-\u{1F3FF}]?)*)$/u;
+
 const ReactionRolesPage: React.FC = () => {
     const { selectedServer } = useServer();
     const [reactionRoles, setReactionRoles] = useState<ReactionRole[]>([]);
@@ -81,6 +84,14 @@ const ReactionRolesPage: React.FC = () => {
             return;
         }
 
+        // Validate emoji formats before submitting
+        for (const pair of rolePairs) {
+            if (!EMOJI_REGEX.test(pair.emoji)) {
+                addToast(`Invalid emoji format: "${pair.emoji}". Please use a single standard or custom Discord emoji.`, "error");
+                return;
+            }
+        }
+
         setSaving(true);
         try {
             await appwriteService.createReactionRole({
@@ -152,7 +163,7 @@ const ReactionRolesPage: React.FC = () => {
                                     <td className="p-4 text-text-secondary">#{metadata?.channels.find(c => c.id === rr.channelId)?.name || 'Unknown'}</td>
                                     <td className="p-4 font-mono text-xs">{rr.messageId}</td>
                                     <td className="p-4 text-sm space-y-1">
-                                      {(Array.isArray(rr.roles) ? rr.roles : []).map((p, i) => <div key={i}>{p.emoji} → @{getRoleName(p.roleId)}</div>)}
+                                      {rr.roles.map((p, i) => <div key={i}>{p.emoji} → @{getRoleName(p.roleId)}</div>)}
                                     </td>
                                     <td className="p-4 text-right">
                                         <button onClick={() => handleDelete(rr.id!)} className="text-red-400 hover:text-red-300">Delete</button>

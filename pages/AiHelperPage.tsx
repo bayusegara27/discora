@@ -1,5 +1,6 @@
 
 
+
 import React, { useState } from 'react';
 import { geminiService } from '../services/gemini';
 import { useToast } from '../contexts/ToastContext';
@@ -21,7 +22,7 @@ const AiHelperPage: React.FC = () => {
       case 'event_idea':
         return 'You are a creative event planner brainstorming fun and unique event ideas for an online community on Discord. Provide 3 distinct ideas with brief descriptions of each. Format the output nicely with headings.';
       case 'poll':
-        return 'You are a Discord admin creating a simple and effective poll question with several options. Format the response with the question on the first line, and each option prefixed with a regional indicator emoji (e.g., 🇦, 🇧, 🇨).';
+        return 'You are a Discord admin creating a simple and effective poll question with between 2 and 5 options. Format the response with the question on the first line, and each option prefixed with a regional indicator emoji (e.g., 🇦, 🇧, 🇨).';
       case 'welcome_message':
         return "You are an expert community manager writing a warm, friendly, and engaging welcome message for a new member on a Discord server. Use markdown formatting. Include the placeholder {user} for the user's name. Suggest a couple of channels for them to check out first.";
       default:
