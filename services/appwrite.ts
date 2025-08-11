@@ -2,6 +2,7 @@
 
 
 
+
 import {
     databases,
     account,
@@ -276,16 +277,9 @@ export const appwriteService = {
                 const roleDistribution = parseJsonField(doc.roleDistribution, []);
                 return { ...mapDoc<ServerStats>(doc), messagesWeekly, roleDistribution };
             }
-            const newStatsData = { 
-                doc_id: "main_stats",
-                guildId, 
-                ...defaultStats, 
-                messagesWeekly: JSON.stringify(defaultStats.messagesWeekly),
-                roleDistribution: JSON.stringify(defaultStats.roleDistribution),
-            };
-            const newDoc = await databases.createDocument(APPWRITE_DATABASE_ID, STATS_COLLECTION_ID, ID.unique(), newStatsData);
-            return mapDoc<ServerStats>(newDoc);
-
+            // If the frontend can't find it, it means the bot hasn't run for that server yet.
+            // Returning default stats is the correct behavior. The bot is responsible for creating it.
+            return { guildId, doc_id: 'main_stats', ...defaultStats };
         } catch (e) {
             console.error(`[Appwrite] getServerStats for guild ${guildId} :: error`, e);
             return { guildId, doc_id: 'main_stats', ...defaultStats };

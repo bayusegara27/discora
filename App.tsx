@@ -72,7 +72,7 @@ const DashboardLayout: React.FC = () => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
 
   return (
-    <div className="flex h-screen bg-background/80 backdrop-blur-3xl text-text-primary relative">
+    <div className="flex h-screen bg-background text-text-primary relative">
       <Sidebar isOpen={isSidebarOpen} setOpen={setSidebarOpen} />
       {isSidebarOpen && <div className="fixed inset-0 bg-black/60 z-20 md:hidden" onClick={() => setSidebarOpen(false)}></div>}
 

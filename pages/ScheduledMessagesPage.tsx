@@ -173,11 +173,11 @@ const ScheduledMessagesPage: React.FC = () => {
             </div>
 
             {isModalOpen && (
-                <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-40" onClick={closeModal}>
-                    <div className="bg-surface rounded-lg shadow-xl w-full max-w-lg" onClick={e => e.stopPropagation()}>
-                        <h3 className="text-xl font-bold p-6 border-b border-gray-700">{editingMessage ? 'Edit' : 'New'} Scheduled Message</h3>
-                        <form onSubmit={handleSubmit}>
-                            <div className="p-6 space-y-4">
+                <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-40" onClick={closeModal}>
+                    <div className="bg-surface rounded-lg shadow-xl w-full max-w-lg flex flex-col max-h-[90vh]" onClick={e => e.stopPropagation()}>
+                        <h3 className="text-xl font-bold p-6 border-b border-gray-700 flex-shrink-0">{editingMessage ? 'Edit' : 'New'} Scheduled Message</h3>
+                        <form onSubmit={handleSubmit} className="flex flex-col flex-grow overflow-hidden">
+                            <div className="p-6 space-y-4 overflow-y-auto">
                                 <div>
                                     <label htmlFor="content" className="block text-sm font-medium text-text-secondary mb-1">Message Content</label>
                                     <textarea name="content" id="content" rows={6} value={currentMessage.content} onChange={handleInputChange} className="w-full bg-background border border-gray-600 rounded-md p-2" required />
@@ -205,7 +205,7 @@ const ScheduledMessagesPage: React.FC = () => {
                                     <input type="datetime-local" name="nextRun" id="nextRun" value={currentMessage.nextRun} onChange={handleInputChange} className="w-full bg-background border border-gray-600 rounded-md p-2" required />
                                 </div>
                             </div>
-                            <div className="flex justify-end gap-4 p-4 bg-secondary/30">
+                            <div className="flex justify-end gap-4 p-4 bg-secondary/30 border-t border-gray-700 flex-shrink-0">
                                 <button type="button" onClick={closeModal} className="text-text-secondary hover:text-text-primary">Cancel</button>
                                 <button type="submit" disabled={saving} className="bg-primary text-white font-bold py-2 px-6 rounded-md hover:bg-opacity-80 disabled:bg-gray-500">
                                     {saving ? 'Saving...' : 'Save'}

@@ -200,52 +200,54 @@ const YoutubePage: React.FC = () => {
             </div>
 
             {isModalOpen && (
-                <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-40" onClick={closeModal}>
-                    <div className="bg-surface rounded-lg shadow-xl w-full max-w-lg p-8 space-y-4" onClick={e => e.stopPropagation()}>
-                        <h3 className="text-xl font-bold">{editingSub ? 'Edit Subscription' : 'New Subscription'}</h3>
-                        <form onSubmit={handleSubmit} className="space-y-4">
-                            <div>
-                                <label htmlFor="youtubeChannelId" className="block text-sm font-medium text-text-secondary mb-1">YouTube Channel ID <InfoTooltip text="Find this in the channel's URL, it starts with 'UC'." /></label>
-                                <input type="text" name="youtubeChannelId" id="youtubeChannelId" value={currentSub.youtubeChannelId} onChange={handleInputChange} className="w-full bg-background border border-gray-600 rounded-md p-2 focus:ring-primary focus:border-primary" required />
+                <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-40" onClick={closeModal}>
+                    <div className="bg-surface rounded-lg shadow-xl w-full max-w-2xl flex flex-col max-h-[90vh]" onClick={e => e.stopPropagation()}>
+                        <h3 className="text-xl font-bold p-6 border-b border-gray-700 flex-shrink-0">{editingSub ? 'Edit Subscription' : 'New Subscription'}</h3>
+                        <form onSubmit={handleSubmit} className="flex flex-col flex-grow overflow-hidden">
+                            <div className="p-6 space-y-4 overflow-y-auto">
+                                <div>
+                                    <label htmlFor="youtubeChannelId" className="block text-sm font-medium text-text-secondary mb-1">YouTube Channel ID <InfoTooltip text="Find this in the channel's URL, it starts with 'UC'." /></label>
+                                    <input type="text" name="youtubeChannelId" id="youtubeChannelId" value={currentSub.youtubeChannelId} onChange={handleInputChange} className="w-full bg-background border border-gray-600 rounded-md p-2 focus:ring-primary focus:border-primary" required />
+                                </div>
+                                <div>
+                                    <label htmlFor="discordChannelId" className="block text-sm font-medium text-text-secondary mb-1">Discord Announcement Channel</label>
+                                    <select 
+                                        name="discordChannelId" 
+                                        id="discordChannelId" 
+                                        value={currentSub.discordChannelId} 
+                                        onChange={handleInputChange} 
+                                        className="w-full bg-background border border-gray-600 rounded-md p-2 focus:ring-primary focus:border-primary" 
+                                        required
+                                    >
+                                        <option value="">Select a channel</option>
+                                        {sortedChannels.map(c => <option key={c.id} value={c.id}>#{c.name}</option>)}
+                                    </select>
+                                </div>
+                                <div>
+                                    <label htmlFor="mentionRoleId" className="block text-sm font-medium text-text-secondary mb-1">Mention Role (Optional)</label>
+                                    <select 
+                                        name="mentionRoleId" 
+                                        id="mentionRoleId"
+                                        value={currentSub.mentionRoleId} 
+                                        onChange={handleInputChange} 
+                                        className="w-full bg-background border border-gray-600 rounded-md p-2 focus:ring-primary focus:border-primary"
+                                    >
+                                        <option value="">Don't mention a role</option>
+                                        {sortedRoles.map(r => <option key={r.id} value={r.id}>@{r.name}</option>)}
+                                    </select>
+                                </div>
+                                <div>
+                                    <label htmlFor="customMessage" className="block text-sm font-medium text-text-secondary mb-1">Custom Upload Message (Optional)</label>
+                                    <textarea name="customMessage" id="customMessage" rows={5} value={currentSub.customMessage} onChange={handleInputChange} className="w-full bg-background border border-gray-600 rounded-md p-2 focus:ring-primary focus:border-primary" />
+                                    <p className="text-xs text-text-secondary mt-1">Placeholders: `{'`{channelName}`'}`, `{'`{videoTitle}`'}`, `{'`{videoUrl}`'}`</p>
+                                </div>
+                                <div>
+                                    <label htmlFor="liveMessage" className="block text-sm font-medium text-text-secondary mb-1">Custom Live Stream Message (Optional)</label>
+                                    <textarea name="liveMessage" id="liveMessage" rows={5} value={currentSub.liveMessage} onChange={handleInputChange} className="w-full bg-background border border-gray-600 rounded-md p-2 focus:ring-primary focus:border-primary" />
+                                    <p className="text-xs text-text-secondary mt-1">Used when a live stream is detected. Placeholders: `{'`{channelName}`'}`, `{'`{videoTitle}`'}`, `{'`{videoUrl}`'}`</p>
+                                </div>
                             </div>
-                            <div>
-                                <label htmlFor="discordChannelId" className="block text-sm font-medium text-text-secondary mb-1">Discord Announcement Channel</label>
-                                <select 
-                                    name="discordChannelId" 
-                                    id="discordChannelId" 
-                                    value={currentSub.discordChannelId} 
-                                    onChange={handleInputChange} 
-                                    className="w-full bg-background border border-gray-600 rounded-md p-2 focus:ring-primary focus:border-primary" 
-                                    required
-                                >
-                                    <option value="">Select a channel</option>
-                                    {sortedChannels.map(c => <option key={c.id} value={c.id}>#{c.name}</option>)}
-                                </select>
-                            </div>
-                            <div>
-                                <label htmlFor="mentionRoleId" className="block text-sm font-medium text-text-secondary mb-1">Mention Role (Optional)</label>
-                                <select 
-                                    name="mentionRoleId" 
-                                    id="mentionRoleId"
-                                    value={currentSub.mentionRoleId} 
-                                    onChange={handleInputChange} 
-                                    className="w-full bg-background border border-gray-600 rounded-md p-2 focus:ring-primary focus:border-primary"
-                                >
-                                     <option value="">Don't mention a role</option>
-                                     {sortedRoles.map(r => <option key={r.id} value={r.id}>@{r.name}</option>)}
-                                </select>
-                            </div>
-                            <div>
-                                <label htmlFor="customMessage" className="block text-sm font-medium text-text-secondary mb-1">Custom Upload Message (Optional)</label>
-                                <textarea name="customMessage" id="customMessage" rows={5} value={currentSub.customMessage} onChange={handleInputChange} className="w-full bg-background border border-gray-600 rounded-md p-2 focus:ring-primary focus:border-primary" />
-                                <p className="text-xs text-text-secondary mt-1">Placeholders: `{'`{channelName}`'}`, `{'`{videoTitle}`'}`, `{'`{videoUrl}`'}`</p>
-                            </div>
-                             <div>
-                                <label htmlFor="liveMessage" className="block text-sm font-medium text-text-secondary mb-1">Custom Live Stream Message (Optional)</label>
-                                <textarea name="liveMessage" id="liveMessage" rows={5} value={currentSub.liveMessage} onChange={handleInputChange} className="w-full bg-background border border-gray-600 rounded-md p-2 focus:ring-primary focus:border-primary" />
-                                <p className="text-xs text-text-secondary mt-1">Used when a live stream is detected. Placeholders: `{'`{channelName}`'}`, `{'`{videoTitle}`'}`, `{'`{videoUrl}`'}`</p>
-                            </div>
-                            <div className="flex justify-end gap-4">
+                            <div className="flex justify-end gap-4 p-4 bg-secondary/30 border-t border-gray-700 flex-shrink-0">
                                 <button type="button" onClick={closeModal} className="text-text-secondary hover:text-text-primary">Cancel</button>
                                 <button type="submit" disabled={saving} className="bg-primary text-white font-bold py-2 px-6 rounded-md hover:bg-opacity-80 transition-colors disabled:bg-gray-500">
                                     {saving ? 'Saving...' : 'Save'}

@@ -177,63 +177,65 @@ const CommandsPage: React.FC = () => {
             </div>
 
             {isModalOpen && (
-                <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-40" onClick={closeModal}>
-                    <div className="bg-surface rounded-lg shadow-xl w-full max-w-lg p-8 space-y-4" onClick={e => e.stopPropagation()}>
-                        <h3 className="text-xl font-bold">{editingCommand ? 'Edit Command' : 'Create New Command'}</h3>
-                        <form onSubmit={handleSubmit} className="space-y-4">
-                            <div>
-                                <label htmlFor="command" className="block text-sm font-medium text-text-secondary mb-1">Command Name (without prefix)</label>
-                                <input 
-                                    type="text" 
-                                    name="command" 
-                                    id="command"
-                                    value={currentCommand.command}
-                                    onChange={handleInputChange}
-                                    className="w-full bg-background border border-gray-600 rounded-md p-2 focus:ring-primary focus:border-primary"
-                                    required
-                                />
-                            </div>
-                            
-                            <div className="flex items-center justify-between">
-                                <label htmlFor="isEmbed" className="font-medium text-text-primary">Response Type</label>
-                                <div className="flex items-center gap-2">
-                                    <span className="text-sm text-text-secondary">Text</span>
-                                    <ToggleSwitch enabled={currentCommand.isEmbed} onChange={val => setCurrentCommand(p => ({...p, isEmbed: val}))} />
-                                    <span className="text-sm text-text-primary">Embed</span>
-                                </div>
-                            </div>
-
-                            {!currentCommand.isEmbed ? (
+                <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-40" onClick={closeModal}>
+                    <div className="bg-surface rounded-lg shadow-xl w-full max-w-2xl flex flex-col max-h-[90vh]" onClick={e => e.stopPropagation()}>
+                        <h3 className="text-xl font-bold p-6 border-b border-gray-700 flex-shrink-0">{editingCommand ? 'Edit Command' : 'Create New Command'}</h3>
+                        <form onSubmit={handleSubmit} className="flex flex-col flex-grow overflow-hidden">
+                            <div className="p-6 space-y-4 overflow-y-auto">
                                 <div>
-                                    <label htmlFor="response" className="block text-sm font-medium text-text-secondary mb-1">Bot's Response</label>
-                                    <textarea 
-                                        name="response" 
-                                        id="response" 
-                                        rows={5}
-                                        value={currentCommand.response}
+                                    <label htmlFor="command" className="block text-sm font-medium text-text-secondary mb-1">Command Name (without prefix)</label>
+                                    <input 
+                                        type="text" 
+                                        name="command" 
+                                        id="command"
+                                        value={currentCommand.command}
                                         onChange={handleInputChange}
                                         className="w-full bg-background border border-gray-600 rounded-md p-2 focus:ring-primary focus:border-primary"
                                         required
-                                    ></textarea>
+                                    />
                                 </div>
-                            ) : (
-                                <div className="space-y-4 p-4 bg-secondary rounded-md">
-                                     <div>
-                                        <label htmlFor="title" className="block text-sm font-medium text-text-secondary mb-1">Embed Title</label>
-                                        <input type="text" name="title" value={currentCommand.embedContent.title} onChange={handleEmbedChange} className="w-full bg-background border border-gray-600 rounded-md p-2" />
-                                    </div>
-                                    <div>
-                                        <label htmlFor="description" className="block text-sm font-medium text-text-secondary mb-1">Embed Description</label>
-                                        <textarea name="description" rows={5} value={currentCommand.embedContent.description} onChange={handleEmbedChange} className="w-full bg-background border border-gray-600 rounded-md p-2"></textarea>
-                                    </div>
-                                    <div>
-                                        <label htmlFor="color" className="block text-sm font-medium text-text-secondary mb-1">Embed Color</label>
-                                        <input type="color" name="color" value={currentCommand.embedContent.color} onChange={handleEmbedChange} className="w-full h-10 bg-background border border-gray-600 rounded-md p-1" />
+                                
+                                <div className="flex items-center justify-between">
+                                    <label htmlFor="isEmbed" className="font-medium text-text-primary">Response Type</label>
+                                    <div className="flex items-center gap-2">
+                                        <span className="text-sm text-text-secondary">Text</span>
+                                        <ToggleSwitch enabled={currentCommand.isEmbed} onChange={val => setCurrentCommand(p => ({...p, isEmbed: val}))} />
+                                        <span className="text-sm text-text-primary">Embed</span>
                                     </div>
                                 </div>
-                            )}
 
-                            <div className="flex justify-end gap-4">
+                                {!currentCommand.isEmbed ? (
+                                    <div>
+                                        <label htmlFor="response" className="block text-sm font-medium text-text-secondary mb-1">Bot's Response</label>
+                                        <textarea 
+                                            name="response" 
+                                            id="response" 
+                                            rows={5}
+                                            value={currentCommand.response}
+                                            onChange={handleInputChange}
+                                            className="w-full bg-background border border-gray-600 rounded-md p-2 focus:ring-primary focus:border-primary"
+                                            required
+                                        ></textarea>
+                                    </div>
+                                ) : (
+                                    <div className="space-y-4 p-4 bg-secondary rounded-md">
+                                        <div>
+                                            <label htmlFor="title" className="block text-sm font-medium text-text-secondary mb-1">Embed Title</label>
+                                            <input type="text" name="title" value={currentCommand.embedContent.title} onChange={handleEmbedChange} className="w-full bg-background border border-gray-600 rounded-md p-2" />
+                                        </div>
+                                        <div>
+                                            <label htmlFor="description" className="block text-sm font-medium text-text-secondary mb-1">Embed Description</label>
+                                            <textarea name="description" rows={5} value={currentCommand.embedContent.description} onChange={handleEmbedChange} className="w-full bg-background border border-gray-600 rounded-md p-2"></textarea>
+                                        </div>
+                                        <div>
+                                            <label htmlFor="color" className="block text-sm font-medium text-text-secondary mb-1">Embed Color</label>
+                                            <input type="color" name="color" value={currentCommand.embedContent.color} onChange={handleEmbedChange} className="w-full h-10 bg-background border border-gray-600 rounded-md p-1" />
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+
+                            <div className="flex justify-end gap-4 p-4 bg-secondary/30 border-t border-gray-700 flex-shrink-0">
                                 <button type="button" onClick={closeModal} className="text-text-secondary hover:text-text-primary">Cancel</button>
                                 <button type="submit" disabled={saving} className="bg-primary text-white font-bold py-2 px-6 rounded-md hover:bg-opacity-80 transition-colors disabled:bg-gray-500">
                                     {saving ? 'Saving...' : 'Save'}

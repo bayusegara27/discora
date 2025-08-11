@@ -1,5 +1,6 @@
 
 
+
 import React, { useState, useEffect } from 'react';
 import { appwriteService } from '../services/appwrite';
 import { LogEntry, LogType } from '../types';
@@ -87,7 +88,7 @@ const AuditLogPage: React.FC = () => {
                                                   <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
                                                 </svg>
                                             </button>
-                                            <div className="absolute right-0 mt-2 w-32 bg-secondary rounded-md shadow-lg z-10 p-1 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none group-hover:pointer-events-auto">
+                                            <div className="absolute right-0 top-full mt-1 w-32 bg-secondary rounded-md shadow-lg z-10 p-1 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none group-hover:pointer-events-auto">
                                                 <button onClick={() => openModal({id: log.userId, name: log.user, avatar: log.userAvatarUrl}, 'kick')} className="block w-full text-left px-4 py-2 text-sm text-text-primary hover:bg-surface rounded">Kick</button>
                                                 <button onClick={() => openModal({id: log.userId, name: log.user, avatar: log.userAvatarUrl}, 'ban')} className="block w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-surface rounded">Ban</button>
                                             </div>

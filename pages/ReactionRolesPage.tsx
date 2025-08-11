@@ -180,57 +180,59 @@ const ReactionRolesPage: React.FC = () => {
             </div>
 
             {isModalOpen && (
-                <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-40" onClick={closeModal}>
-                    <div className="bg-surface rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] flex flex-col" onClick={e => e.stopPropagation()}>
-                        <h3 className="text-xl font-bold p-6 border-b border-gray-700">New Reaction Role Message</h3>
-                        <form onSubmit={handleSubmit} className="flex-grow overflow-y-auto p-6 space-y-4">
-                            <div>
-                                <label htmlFor="channelId" className="block text-sm font-medium text-text-secondary mb-1">Post in Channel</label>
-                                <select id="channelId" value={channelId} onChange={e => setChannelId(e.target.value)} className="w-full bg-background border border-gray-600 rounded-md p-2" required>
-                                    <option value="">Select a channel</option>
-                                    {sortedChannels.map(c => <option key={c.id} value={c.id}>#{c.name}</option>)}
-                                </select>
-                            </div>
-                            <div className="p-4 bg-secondary rounded-md space-y-4">
-                                <h4 className="font-semibold">Embed Content</h4>
-                                <div className="flex gap-4">
-                                    <div className="flex-grow">
-                                        <label htmlFor="embedTitle" className="block text-sm font-medium text-text-secondary mb-1">Title</label>
-                                        <input type="text" id="embedTitle" value={embedTitle} onChange={e => setEmbedTitle(e.target.value)} className="w-full bg-background border border-gray-600 rounded-md p-2" required />
+                <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-40" onClick={closeModal}>
+                    <div className="bg-surface rounded-lg shadow-xl w-full max-w-2xl flex flex-col max-h-[90vh]" onClick={e => e.stopPropagation()}>
+                        <h3 className="text-xl font-bold p-6 border-b border-gray-700 flex-shrink-0">New Reaction Role Message</h3>
+                        <form onSubmit={handleSubmit} className="flex flex-col flex-grow overflow-hidden">
+                             <div className="p-6 space-y-4 overflow-y-auto">
+                                <div>
+                                    <label htmlFor="channelId" className="block text-sm font-medium text-text-secondary mb-1">Post in Channel</label>
+                                    <select id="channelId" value={channelId} onChange={e => setChannelId(e.target.value)} className="w-full bg-background border border-gray-600 rounded-md p-2" required>
+                                        <option value="">Select a channel</option>
+                                        {sortedChannels.map(c => <option key={c.id} value={c.id}>#{c.name}</option>)}
+                                    </select>
+                                </div>
+                                <div className="p-4 bg-secondary rounded-md space-y-4">
+                                    <h4 className="font-semibold">Embed Content</h4>
+                                    <div className="flex gap-4">
+                                        <div className="flex-grow">
+                                            <label htmlFor="embedTitle" className="block text-sm font-medium text-text-secondary mb-1">Title</label>
+                                            <input type="text" id="embedTitle" value={embedTitle} onChange={e => setEmbedTitle(e.target.value)} className="w-full bg-background border border-gray-600 rounded-md p-2" required />
+                                        </div>
+                                        <div>
+                                            <label htmlFor="embedColor" className="block text-sm font-medium text-text-secondary mb-1">Color</label>
+                                            <input type="color" id="embedColor" value={embedColor} onChange={e => setEmbedColor(e.target.value)} className="w-20 h-10 bg-background border border-gray-600 rounded-md p-1" />
+                                        </div>
                                     </div>
                                     <div>
-                                        <label htmlFor="embedColor" className="block text-sm font-medium text-text-secondary mb-1">Color</label>
-                                        <input type="color" id="embedColor" value={embedColor} onChange={e => setEmbedColor(e.target.value)} className="w-20 h-10 bg-background border border-gray-600 rounded-md p-1" />
+                                        <label htmlFor="embedDescription" className="block text-sm font-medium text-text-secondary mb-1">Description (Optional)</label>
+                                        <textarea id="embedDescription" rows={4} value={embedDescription} onChange={e => setEmbedDescription(e.target.value)} className="w-full bg-background border border-gray-600 rounded-md p-2" />
                                     </div>
                                 </div>
-                                 <div>
-                                    <label htmlFor="embedDescription" className="block text-sm font-medium text-text-secondary mb-1">Description (Optional)</label>
-                                    <textarea id="embedDescription" rows={4} value={embedDescription} onChange={e => setEmbedDescription(e.target.value)} className="w-full bg-background border border-gray-600 rounded-md p-2" />
+                                <div>
+                                    <h4 className="font-semibold mb-2">Emoji & Role Pairs</h4>
+                                    <div className="space-y-2">
+                                        {rolePairs.map((pair, index) => (
+                                            <div key={index} className="flex items-center gap-2 p-2 bg-secondary rounded-md">
+                                                <input type="text" placeholder="Emoji" value={pair.emoji} onChange={e => handlePairChange(index, 'emoji', e.target.value)} className="w-20 bg-background border border-gray-600 rounded-md p-2 text-center" />
+                                                <select value={pair.roleId} onChange={e => handlePairChange(index, 'roleId', e.target.value)} className="flex-grow bg-background border border-gray-600 rounded-md p-2">
+                                                    <option value="">Select a role</option>
+                                                    {sortedRoles.map(r => <option key={r.id} value={r.id}>@{r.name}</option>)}
+                                                </select>
+                                                <button type="button" onClick={() => removePair(index)} className="text-red-400 hover:text-red-300 p-2 rounded-md">&times;</button>
+                                            </div>
+                                        ))}
+                                    </div>
+                                    <button type="button" onClick={addPair} className="mt-2 text-sm text-accent hover:underline">+ Add another role</button>
                                 </div>
                             </div>
-                            <div>
-                                <h4 className="font-semibold mb-2">Emoji & Role Pairs</h4>
-                                <div className="space-y-2">
-                                    {rolePairs.map((pair, index) => (
-                                        <div key={index} className="flex items-center gap-2 p-2 bg-secondary rounded-md">
-                                            <input type="text" placeholder="Emoji" value={pair.emoji} onChange={e => handlePairChange(index, 'emoji', e.target.value)} className="w-16 bg-background border border-gray-600 rounded-md p-2 text-center" />
-                                            <select value={pair.roleId} onChange={e => handlePairChange(index, 'roleId', e.target.value)} className="flex-grow bg-background border border-gray-600 rounded-md p-2">
-                                                <option value="">Select a role</option>
-                                                {sortedRoles.map(r => <option key={r.id} value={r.id}>@{r.name}</option>)}
-                                            </select>
-                                            <button type="button" onClick={() => removePair(index)} className="text-red-400 hover:text-red-300 p-2 rounded-md">&times;</button>
-                                        </div>
-                                    ))}
-                                </div>
-                                <button type="button" onClick={addPair} className="mt-2 text-sm text-accent hover:underline">+ Add another role</button>
+                            <div className="flex justify-end gap-4 p-4 bg-secondary/30 border-t border-gray-700 flex-shrink-0">
+                                <button type="button" onClick={closeModal} className="text-text-secondary hover:text-text-primary">Cancel</button>
+                                <button type="submit" disabled={saving} className="bg-primary text-white font-bold py-2 px-6 rounded-md hover:bg-opacity-80 disabled:bg-gray-500">
+                                    {saving ? 'Saving...' : 'Create Message'}
+                                </button>
                             </div>
                         </form>
-                        <div className="flex justify-end gap-4 p-6 border-t border-gray-700">
-                            <button type="button" onClick={closeModal} className="text-text-secondary hover:text-text-primary">Cancel</button>
-                            <button type="submit" form="react-hook-form" onClick={handleSubmit} disabled={saving} className="bg-primary text-white font-bold py-2 px-6 rounded-md hover:bg-opacity-80 disabled:bg-gray-500">
-                                {saving ? 'Saving...' : 'Create Message'}
-                            </button>
-                        </div>
                     </div>
                 </div>
             )}
